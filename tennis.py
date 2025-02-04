@@ -236,7 +236,7 @@ def send_email(subject, body):
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg["To"] = receiver_email
+    msg["To"] = ", ".join(receiver_email)  # ✅ 解决 encode 错误
     msg["Subject"] = subject
 
     msg.attach(MIMEText(body, "plain"))
