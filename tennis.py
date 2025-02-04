@@ -185,26 +185,25 @@ for date in available_dates + partially_available_dates:
         availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
 
         # **解析新数据**
-        pattern_slots = re.compile(r'<td id="(\d{8}_\d{2})".*?<img[^>]*?alt="空き".*?<span>(\d+)</span>', re.S)
+        pattern_slots = re.compile(
+            r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
+            re.S
+        )
 
         for match in pattern_slots.finditer(html_after_click):
-            full_slot_id = match.group(1)
-            slot_date, slot_suffix = full_slot_id.split("_")
+            slot_date, slot_suffix, available_count = match.groups()
 
             # **只存入当前点击的日期，不存入其他日期**
             if slot_date == date:
                 slot_time = {
                     "10": "7-9点", "20": "9-11点", "30": "11-13点",
                     "40": "13-15点", "50": "15-17点", "60": "17-19点", "70": "19-21点"
-                }[slot_suffix]
-                available_count = match.group(2)
+                }.get(slot_suffix, "未知时间段")
 
-                # **更新 availability_info，确保最终包含所有可预约日期**
                 availability_info[(slot_date, slot_time)] = available_count
 
     except TimeoutException:
         logging.error(f"无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
-
 
 # **最终汇总**
 logging.info("所有可预约时间段:")
