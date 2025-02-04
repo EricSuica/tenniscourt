@@ -231,8 +231,8 @@ from email.mime.multipart import MIMEMultipart
 # 📩 **邮件发送函数**
 def send_email(subject, body):
     sender_email = os.getenv("sender_email") # 你的 Gmail 地址
-    receiver_email = os.getenv("receiver_email") # 收件人邮箱
-    password = os.getenv("password").split(",")# Gmail 应用专用密码
+    receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
+    password = os.getenv("password")# Gmail 应用专用密码
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
