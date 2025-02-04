@@ -10,8 +10,6 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
-from dotenv import load_dotenv
-load_dotenv("/root/tenniscourt/config.env")
 
 # 设置日志
 logging.basicConfig(
@@ -74,67 +72,43 @@ search_button.click()
 logging.info("搜索按钮点击成功")
 
 # **等待 URL 变化**
-max_retries = 3  # 允许最多重试 3 次
-retry_count = 0
-
-while retry_count < max_retries:
-    try:
-        WebDriverWait(driver, 20).until(lambda driver: driver.current_url != url)
-        logging.info("页面跳转成功")
-        break  # ✅ 成功，跳出循环
-    except TimeoutException:
-        retry_count += 1
-        logging.error(f"页面跳转超时，正在重试 ({retry_count}/{max_retries})")
-        if retry_count == max_retries:
-            logging.error("页面跳转失败，达到最大重试次数，退出")
-            driver.quit()
-            exit()
-        time.sleep(3)  # ⏳ 等待 3 秒后再尝试
+try:
+    WebDriverWait(driver, 20).until(lambda driver: driver.current_url != url)
+    logging.info("页面跳转成功")
+except TimeoutException:
+    logging.error("页面跳转超时")
+    driver.quit()
+    exit()
 
 # **等待搜索结果页面加载**
-retry_count = 0
-while retry_count < max_retries:
-    try:
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.ID, "loadedmonth"))
-        )
-        logging.info("月份信息加载成功")
-        break  # ✅ 成功，跳出循环
-    except TimeoutException:
-        retry_count += 1
-        logging.error(f"月份信息加载失败，正在重试 ({retry_count}/{max_retries})")
-        if retry_count == max_retries:
-            logging.error("月份信息加载失败，达到最大重试次数，退出")
-            driver.quit()
-            exit()
-        time.sleep(3)  # ⏳ 等待 3 秒后再尝试
+try:
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.ID, "loadedmonth"))
+    )
+    logging.info("月份信息加载成功")
+except TimeoutException:
+    logging.error("月份信息加载失败")
+    driver.quit()
+    exit()
 
 # 1️⃣2️⃣ **点击折叠按钮，智能等待加载完成**
-retry_count = 0
-while retry_count < max_retries:
-    try:
-        expand_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "span-icon-down"))
-        )
-        expand_button.click()
-        logging.info("点击展开月份按钮")
+try:
+    expand_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "span-icon-down"))
+    )
+    expand_button.click()
+    logging.info("点击展开月份按钮")
 
-        WebDriverWait(driver, 30).until(
-            EC.visibility_of_element_located((By.ID, "month-info"))
-        )
-        logging.info("月份信息已展开")
-        break  # ✅ 成功，跳出循环
-    except TimeoutException:
-        retry_count += 1
-        logging.error(f"月份信息展开失败，正在重试 ({retry_count}/{max_retries})")
-        if retry_count == max_retries:
-            logging.error("月份信息展开失败，达到最大重试次数，退出")
-            driver.quit()
-            exit()
-        time.sleep(3)  # ⏳ 等待 3 秒后再尝试
-    except NoSuchElementException:
-        logging.warning("找不到展开按钮，可能已经展开")
-        break  # ✅ 可能已经展开，跳出循环
+    WebDriverWait(driver, 30).until(
+        EC.visibility_of_element_located((By.ID, "month-info"))
+    )
+    logging.info("月份信息已展开")
+except TimeoutException:
+    logging.error("月份信息展开失败")
+    driver.quit()
+    exit()
+except NoSuchElementException:
+    logging.warning("找不到展开按钮，可能已经展开")
 
 # **获取当前 HTML 页面**
 html_before_click = driver.execute_script("return document.body.outerHTML;")
@@ -178,11 +152,8 @@ for date in available_dates + partially_available_dates:
         logging.info(f"{date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
 
         # **获取最新 HTML**
-        time.sleep(10)  # **短暂等待 JS 渲染**
+        time.sleep(5)  # **短暂等待 JS 渲染**
         html_after_click = driver.execute_script("return document.body.outerHTML;")
-
-        # **先清理当前日期的旧数据，防止错误数据残留**
-        availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
 
         # **解析新数据**
         pattern_slots = re.compile(r'<td id="(\d{8}_\d{2})".*?<img[^>]*?alt="空き".*?<span>(\d+)</span>', re.S)
@@ -190,21 +161,15 @@ for date in available_dates + partially_available_dates:
         for match in pattern_slots.finditer(html_after_click):
             full_slot_id = match.group(1)
             slot_date, slot_suffix = full_slot_id.split("_")
-
-            # **只存入当前点击的日期，不存入其他日期**
-            if slot_date == date:
-                slot_time = {
-                    "10": "7-9点", "20": "9-11点", "30": "11-13点",
-                    "40": "13-15点", "50": "15-17点", "60": "17-19点", "70": "19-21点"
-                }[slot_suffix]
-                available_count = match.group(2)
-
-                # **更新 availability_info，确保最终包含所有可预约日期**
-                availability_info[(slot_date, slot_time)] = available_count
+            slot_time = {
+                "10": "7-9点", "20": "9-11点", "30": "11-13点",
+                "40": "13-15点", "50": "15-17点", "60": "17-19点", "70": "19-21点"
+            }[slot_suffix]
+            available_count = match.group(2)
+            availability_info[(slot_date, slot_time)] = available_count
 
     except TimeoutException:
         logging.error(f"无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
-
 
 # **最终汇总**
 logging.info("所有可预约时间段:")
@@ -212,86 +177,3 @@ for (date, time_slot), count in availability_info.items():
     logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
 
 driver.quit()
-
-
-
-
-
-
-
-
-
-
-
-import smtplib
-import os
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-# 📩 **邮件发送函数**
-def send_email(subject, body):
-    sender_email = os.getenv("sender_email") # 你的 Gmail 地址
-    receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-    password = os.getenv("password")# Gmail 应用专用密码
-
-    msg = MIMEMultipart()
-    msg["From"] = sender_email
-    msg["To"] = ", ".join(receiver_email)  # ✅ 解决 encode 错误
-    msg["Subject"] = subject
-
-    msg.attach(MIMEText(body, "plain"))
-
-    try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        server.quit()
-        logging.info("📧 邮件发送成功")
-    except Exception as e:
-        logging.error(f"❌ 邮件发送失败: {e}")
-
-# 📂 **读取上次的预约信息**
-last_file = "last_availability.txt"
-if os.path.exists(last_file):
-    with open(last_file, "r", encoding="utf-8") as f:
-        last_availability = f.read()
-else:
-    last_availability = ""
-
-# 📌 **按照 日期 和 时间 进行排序**
-time_order = {
-    "7-9点": 1, "9-11点": 2, "11-13点": 3,
-    "13-15点": 4, "15-17点": 5, "17-19点": 6, "19-21点": 7
-}
-
-sorted_availability = sorted(
-    availability_info.items(),
-    key=lambda x: (x[0][0], time_order.get(x[0][1], 99))  # 先按日期排序，再按时间排序
-)
-
-from datetime import datetime
-
-# 📌 **定义曜日映射**
-weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
-
-# 📝 **当前预约信息（排序后，带星期）**
-current_availability = "\n".join([
-    f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot} | 可预约：{count} 人"
-    for (date, time_slot), count in sorted_availability
-])
-
-# 📌 **比较新旧数据**
-if current_availability.strip() != last_availability.strip():
-    logging.info("🔔 预约信息发生变化，发送邮件通知")
-    
-    # **📩 发送邮件**
-    email_subject = "🏸 网球场预约更新通知"
-    email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
-    send_email(email_subject, email_body)
-
-    # **📂 更新 `last_availability.txt`**
-    with open(last_file, "w", encoding="utf-8") as f:
-        f.write(current_availability)
-else:
-    logging.info("✅ 预约信息无变化，不发送邮件")
