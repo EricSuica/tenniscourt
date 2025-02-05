@@ -299,7 +299,7 @@ if current_availability.strip() != last_availability_toneri.strip():
     logging.info("🔔 预约信息发生变化，发送邮件通知")
     
     # **📩 发送邮件**
-    email_subject = "🏸 有明-网球场预约更新通知"
+    email_subject = "🏸 舍人-网球场预约更新通知"
     email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
     send_email(email_subject, email_body)
 
