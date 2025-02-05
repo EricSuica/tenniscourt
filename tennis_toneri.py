@@ -17,7 +17,7 @@ load_dotenv("/root/tenniscourt/config.env")
 
 # 设置日志
 logging.basicConfig(
-    filename="scraper.log",  # 输出到文件
+    filename="tennis_toneri.log",  # 输出到文件
     level=logging.INFO,  # 记录 INFO 及以上级别的日志
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
