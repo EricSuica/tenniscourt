@@ -265,7 +265,7 @@ def send_email(subject, body):
         logging.error(f"❌ 邮件发送失败: {e}")
 
 # 📂 **读取上次的预约信息**
-last_file = "last_availability_ariake_ariake.txt"
+last_file = "last_availability_ariake.txt"
 if os.path.exists(last_file):
     with open(last_file, "r", encoding="utf-8") as f:
         last_availability_ariake = f.read()
