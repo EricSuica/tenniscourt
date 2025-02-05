@@ -56,18 +56,18 @@ logging.info("搜索按钮加载成功")
 
 # 5️⃣ 选择 種目（选择 "テニス（ハード）"）
 sport_select = Select(driver.find_element(By.ID, "purpose-home"))
-sport_select.select_by_value("1000_1020")  # "テニス（ハード）"
+sport_select.select_by_value("1000_1030")  # "テニス（人工芝）"
 logging.info("種目选择成功")
 
 # 6️⃣ **等待 JavaScript 更新公园选项**
 WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//select[@id='bname-home']/option[@value='1350']"))
+    EC.presence_of_element_located((By.XPATH, "//select[@id='bname-home']/option[@value='1140']"))
 )
 logging.info("公园选项加载成功")
 
-# 7️⃣ 选择 公園（选择 "有明テニスＡ屋外ハードコート"）
+# 7️⃣ 选择 公園（选择 "舎人公園"）
 park_select = Select(driver.find_element(By.ID, "bname-home"))
-park_select.select_by_value("1350")
+park_select.select_by_value("1140")
 logging.info("公园选择成功")
 
 # 8️⃣ **点击搜索按钮**
