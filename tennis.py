@@ -11,6 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
+import jpholiday
+from datetime import datetime
 load_dotenv("/root/tenniscourt/config.env")
 
 # 设置日志
@@ -154,8 +156,20 @@ for match in pattern.finditer(html_before_click):
     elif status == "一部空き":
         partially_available_dates.append(date_number)
 
+
 logging.info(f"可预约的日期（完全空闲）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲）：{partially_available_dates}")
+# 🎌 **过滤掉非休日 & 非祝日的日期**
+def is_holiday_or_weekend(date_str):
+    """检查日期是否为日本的周六、周日或祝日"""
+    date_obj = datetime.strptime(date_str, "%Y%m%d")
+    return date_obj.weekday() in [5, 6] or jpholiday.is_holiday(date_obj)
+
+available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
+partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
+
+logging.info(f"可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+logging.info(f"可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
 
 # **存储所有空位信息**
 availability_info = {}
