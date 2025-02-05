@@ -160,7 +160,7 @@ for match in pattern.finditer(html_before_click):
 logging.info(f"可预约的日期（完全空闲）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲）：{partially_available_dates}")
 
-"""
+
 # 🎌 **过滤掉非休日 & 非祝日的日期**
 def is_holiday_or_weekend(date_str):
     """检查日期是否为日本的周六、周日或祝日"""
@@ -172,7 +172,7 @@ partially_available_dates = [date for date in partially_available_dates if is_ho
 
 logging.info(f"可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
-"""
+
 # **存储所有空位信息**
 availability_info = {}
 
