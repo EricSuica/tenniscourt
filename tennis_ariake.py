@@ -265,12 +265,12 @@ def send_email(subject, body):
         logging.error(f"❌ 邮件发送失败: {e}")
 
 # 📂 **读取上次的预约信息**
-last_file = "last_availability.txt"
+last_file = "last_availability_ariake_ariake.txt"
 if os.path.exists(last_file):
     with open(last_file, "r", encoding="utf-8") as f:
-        last_availability = f.read()
+        last_availability_ariake = f.read()
 else:
-    last_availability = ""
+    last_availability_ariake = ""
 
 # 📌 **按照 日期 和 时间 进行排序**
 time_order = {
@@ -295,15 +295,15 @@ current_availability = "\n".join([
 ])
 
 # 📌 **比较新旧数据**
-if current_availability.strip() != last_availability.strip():
+if current_availability.strip() != last_availability_ariake.strip():
     logging.info("🔔 预约信息发生变化，发送邮件通知")
     
     # **📩 发送邮件**
-    email_subject = "🏸 网球场预约更新通知"
+    email_subject = "🏸 有明-网球场预约更新通知"
     email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
     send_email(email_subject, email_body)
 
-    # **📂 更新 `last_availability.txt`**
+    # **📂 更新 `last_availability_ariake.txt`**
     with open(last_file, "w", encoding="utf-8") as f:
         f.write(current_availability)
 else:
