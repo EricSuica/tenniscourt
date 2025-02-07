@@ -240,7 +240,7 @@ def send_email(subject, body):
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.send_message(msg)
         server.quit()
         logging.info("📧 邮件发送成功")
     except Exception as e:
