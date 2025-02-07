@@ -210,6 +210,7 @@ except Exception as e:
     logging.exception("解析空位信息失败：%s", e)
 
 driver.quit()
+shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
 
 
 
