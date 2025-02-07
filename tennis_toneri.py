@@ -16,6 +16,15 @@ from datetime import datetime
 load_dotenv("/root/tenniscourt/config.env")
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
+
+from selenium import webdriver
+import tempfile
+import shutil
+
+
+
+
+
 # 设置日志
 logging.basicConfig(
     filename="tennis_toneri.log",  # 输出到文件
@@ -231,6 +240,7 @@ for (date, time_slot), count in availability_info.items():
     logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
 
 driver.quit()
+shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
 
 
 
