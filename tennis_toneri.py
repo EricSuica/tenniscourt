@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 import jpholiday
 from datetime import datetime
 load_dotenv("/root/tenniscourt/config.env")
+time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 设置日志
 logging.basicConfig(
