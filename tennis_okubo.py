@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
-load_dotenv("/root/tenniscourt/config.env")
+load_dotenv("/root/tenniscourt/config.env", override=True)
 
 # 配置日志输出到文件
 logging.basicConfig(
@@ -226,8 +226,9 @@ def send_email(subject, body):
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg["To"] = ", ".join(receiver_email)  # ✅ 解决 encode 错误
+    msg['To'] = "<noreply@example.com>"
     msg["Subject"] = subject
+    msg['Bcc'] = ', '.join(RECIPIENT_EMAIL) if isinstance(RECIPIENT_EMAIL, list) else RECIPIENT_EMAIL
 
     msg.attach(MIMEText(body, "plain"))
 
