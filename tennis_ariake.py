@@ -25,6 +25,7 @@ logging.basicConfig(
 
 # 1️⃣ 配置 Selenium
 options = Options()
+options.add_argument("--headless")  # 无头模式运行
 options.add_argument("--disable-gpu")
 options.add_argument("--window-size=1920x1080")
 options.add_argument("--no-sandbox")
@@ -262,7 +263,7 @@ def send_email(subject, body):
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.send_message(msg)
         server.quit()
         logging.info("📧 邮件发送成功")
     except Exception as e:
