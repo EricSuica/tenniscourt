@@ -249,16 +249,6 @@ if os.path.exists(last_file):
 else:
     last_availability_okubo = ""
 
-# 📌 **按照 日期 和 时间 进行排序**
-time_order = {
-    "7-9点": 1, "9-11点": 2, "11-13点": 3,
-    "13-15点": 4, "15-17点": 5, "17-19点": 6, "19-21点": 7
-}
-
-sorted_availability = sorted(
-    availability_info.items(),
-    key=lambda x: (x[0][0], time_order.get(x[0][1], 99))  # 先按日期排序，再按时间排序
-)
 
 from datetime import datetime
 
@@ -268,7 +258,7 @@ weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
 # 📝 **当前预约信息（排序后，带星期）**
 current_availability = "\n".join([
     f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot} | 可预约：{count} 人"
-    for (date, time_slot), count in sorted_availability
+    for (date, time_slot), count in last_availability_okubo
 ])
 
 # 📌 **比较新旧数据**
