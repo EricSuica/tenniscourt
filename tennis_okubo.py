@@ -229,7 +229,7 @@ def send_email(subject, body):
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg['To'] = "<noreply@example.com>"
+    msg['To'] = "Undisclosed Recipients <noreply@example.com>"
     msg["Subject"] = subject
     msg['Bcc'] = ', '.join(receiver_email) if isinstance(receiver_email, list) else receiver_email
 
