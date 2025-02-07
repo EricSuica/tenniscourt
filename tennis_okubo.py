@@ -231,7 +231,7 @@ def send_email(subject, body):
     msg["From"] = sender_email
     msg['To'] = "<noreply@example.com>"
     msg["Subject"] = subject
-    msg['Bcc'] = ', '.join(RECIPIENT_EMAIL) if isinstance(RECIPIENT_EMAIL, list) else RECIPIENT_EMAIL
+    msg['Bcc'] = ', '.join(receiver_email) if isinstance(receiver_email, list) else receiver_email
 
     msg.attach(MIMEText(body, "plain"))
 
