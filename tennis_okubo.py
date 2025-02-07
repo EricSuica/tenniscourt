@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
-load_dotenv("/root/tenniscourt/config.env", override=True)
+load_dotenv("/root/tenniscourt/config.env")
 
 # 配置日志输出到文件
 logging.basicConfig(
