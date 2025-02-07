@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from datetime import datetime
-load_dotenv("/root/tenniscourt/config.env", override=True)
+load_dotenv("/root/tenniscourt/config.env")
 
 # 设置日志
 logging.basicConfig(
