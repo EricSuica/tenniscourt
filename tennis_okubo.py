@@ -245,37 +245,38 @@ def send_email(subject, body):
     except Exception as e:
         logging.error(f"❌ 邮件发送失败: {e}")
 
-# 📂 **读取上次的预约信息**
+# 📂 读取上次的预约信息
 last_file = "last_availability_okubo.txt"
 if os.path.exists(last_file):
     with open(last_file, "r", encoding="utf-8") as f:
-        last_availability_okubo = f.read()
+        last_availability_okubo = f.read().strip()
 else:
     last_availability_okubo = ""
 
-
-from datetime import datetime
-
-# 📌 **定义曜日映射**
+# 📌 定义曜日映射
 weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
 
 # 📝 **当前预约信息（排序后，带星期）**
 current_availability = "\n".join([
-    f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot} | 可预约：{count} 人"
-    for (date, time_slot), count in last_availability_okubo
+    f"{entry['date']} ({weekday_japanese[datetime.strptime(entry['date'], '%m/%d').weekday()]}) | {entry['time']} | 可预约"
+    for entry in availability_info
 ])
 
-# 📌 **比较新旧数据**
-if current_availability.strip() != last_availability_okubo.strip():
-    logging.info("🔔 预约信息发生变化，发送邮件通知")
-    
-    # **📩 发送邮件**
-    email_subject = "🏸 大久保-网球场预约更新通知"
-    email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
-    send_email(email_subject, email_body)
+# **确保 current_availability 不是空的**
+if current_availability:
+    # 📌 **比较新旧数据**
+    if current_availability.strip() != last_availability_okubo.strip():
+        logging.info("🔔 预约信息发生变化，发送邮件通知")
+        
+        # **📩 发送邮件**
+        email_subject = "🏸 大久保-网球场预约更新通知"
+        email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
+        send_email(email_subject, email_body)
 
-    # **📂 更新 `last_availability_okub o.txt`**
-    with open(last_file, "w", encoding="utf-8") as f:
-        f.write(current_availability)
+        # **📂 更新 `last_availability_okubo.txt`**
+        with open(last_file, "w", encoding="utf-8") as f:
+            f.write(current_availability)
+    else:
+        logging.info("✅ 预约信息无变化，不发送邮件")
 else:
-    logging.info("✅ 预约信息无变化，不发送邮件")
+    logging.warning("❌ 没有找到新的可预约时间，文件不会被更新")
