@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from datetime import datetime
-load_dotenv("/root/tenniscourt/config.env")
+load_dotenv("/root/tenniscourt/config.env", override=True)
 
 # 设置日志
 logging.basicConfig(
@@ -249,8 +249,10 @@ def send_email(subject, body):
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
-    msg["To"] = ", ".join(receiver_email)  # ✅ 解决 encode 错误
+    msg['To'] = "<noreply@example.com>"
     msg["Subject"] = subject
+    msg['Bcc'] = ', '.join(RECIPIENT_EMAIL) if isinstance(RECIPIENT_EMAIL, list) else RECIPIENT_EMAIL
+
 
     msg.attach(MIMEText(body, "plain"))
 
