@@ -25,7 +25,6 @@ logging.basicConfig(
 
 # 1️⃣ 配置 Selenium
 options = Options()
-options.add_argument("--headless")  # 可去掉调试
 options.add_argument("--disable-gpu")
 options.add_argument("--window-size=1920x1080")
 options.add_argument("--no-sandbox")
