@@ -323,7 +323,6 @@ except Exception as e:
 
 
 
-import pandas as pd
 from selenium.common.exceptions import  TimeoutException, ElementNotInteractableException
 
 # 解析 HTML
