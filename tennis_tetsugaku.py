@@ -19,7 +19,7 @@ time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
 logging.basicConfig(
-    filename="tennis_okubo.log",  # 日志文件名
+    filename="tennis_tetsugaku.log",  # 日志文件名
     level=logging.INFO,             # 记录 INFO 及以上级别的日志
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
