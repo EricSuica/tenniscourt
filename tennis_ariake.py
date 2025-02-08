@@ -229,7 +229,6 @@ for (date, time_slot), count in availability_info.items():
     logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
 
 driver.quit()
-shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
 
 
 
@@ -315,3 +314,5 @@ if current_availability.strip() != last_availability_ariake.strip():
         f.write(current_availability)
 else:
     logging.info("✅ 预约信息无变化，不发送邮件")
+shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
+
