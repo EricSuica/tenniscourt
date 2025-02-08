@@ -256,11 +256,10 @@ except Exception as e:
 
 from datetime import datetime  # 修正导入
 try:
-    """ # 获取今天的日期（格式：YYYYMMDD）
+    # 获取今天的日期（格式：YYYYMMDD）
     today_date = datetime.today().strftime("%Y%m%d")  # 修正这里
     logging.info(f"今天的日期是：{today_date}")
-    """
-    today_date = 20250208
+    
     # 构造动态的 XPath 来匹配 `onclick="dateClick(..., YYYYMMDD)"`
     date_xpath = f"//td[contains(@onclick, 'dateClick') and contains(@onclick, '{today_date}')]"
 
