@@ -33,9 +33,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-blink-features=AutomationControlled")  
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")  
-import tempfile
-unique_user_data_dir = tempfile.mkdtemp()
-options.add_argument(f"--user-data-dir={unique_user_data_dir}")
+
 
 # 2️⃣ 启动 WebDriver
 service = Service(ChromeDriverManager().install())
@@ -314,5 +312,4 @@ if current_availability.strip() != last_availability_ariake.strip():
         f.write(current_availability)
 else:
     logging.info("✅ 预约信息无变化，不发送邮件")
-shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
 
