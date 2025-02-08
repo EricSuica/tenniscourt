@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
 load_dotenv("/root/tenniscourt/config.env")
-#time.sleep(random.uniform(1, 30))  # 等待随机秒数
+time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
 logging.basicConfig(
