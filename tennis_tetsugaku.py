@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
 load_dotenv("/root/tenniscourt/config.env")
-time.sleep(random.uniform(1, 30))  # 等待随机秒数
+#time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
 logging.basicConfig(
@@ -39,7 +39,7 @@ service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
 # 2️⃣ 访问主页并确保加载成功
-url = "https://user.shinjuku-shisetsu-yoyaku.jp/regasu/reserve/gin_menu"
+url = "https://yoyaku.nakano-tokyo.jp/stagia/reserve/grb_init"
 while True:
     driver.get(url)
     try:
@@ -55,227 +55,406 @@ logging.info("搜索按钮加载成功")
 
 # 3️⃣ 依次点击页面中的各个按钮或链接
 
-# 点击“かんたん操作”按钮
-try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='image' and @alt='かんたん操作']"))
-    )
-    image_button.click()
-    logging.info("已点击按钮 'かんたん操作'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（かんたん操作按钮）：%s", e)
-
 # 点击“空き状況確認”按钮
 try:
     image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='image' and @alt='空き状況確認']"))
+        EC.element_to_be_clickable((By.XPATH, "//input[@type='image' and contains(@src, 'btn_check_status_01.gif')]"))
     )
     image_button.click()
     logging.info("已点击按钮 '空き状況確認'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "allChecked")))
 except Exception as e:
     logging.exception("操作失败（空き状況確認按钮）：%s", e)
 
-# 点击 id 为 "button3" 的链接
+
+
+#分類選択1
+
 try:
+
     link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "button3"))
+        EC.element_to_be_clickable((By.ID, "allChecked"))
     )
     link_button.click()
-    logging.info("已点击链接按钮 'button3'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（button3）：%s", e)
+    logging.info("已点击链接按钮 '全て'")
 
-# 点击 id 为 "id0" 的链接
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//a[@id='allChecked' and contains(@class, 'active')]"))
+    )
+
+    logging.info("点击成功，按钮已变为 'active' 状态")
+except Exception as e:
+    logging.exception("操作失败(allChecked):%s", e)
+
+
+# 点击“确定”按钮
 try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-ok.gif')]"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '確定'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "button2")))
+
+except Exception as e:
+    logging.exception("操作失败（確定）：%s", e)
+
+
+#分類選択２
+
+
+try:
+    # 等待并点击 id="button2" 的链接
+    link_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "button2"))
+    )
+    link_button.click()
+    logging.info("已点击链接按钮 '運動施設'")
+
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//a[@id='button2' and contains(@class, 'active')]"))
+    )
+
+    logging.info("点击成功，按钮已变为 'active' 状态")
+except Exception as e:
+    logging.exception("操作失败（運動施設）：%s", e)
+
+# 点击“确定”按钮
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-ok.gif')]"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '確定'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-page-next.gif')]")))
+except Exception as e:
+    logging.exception("操作失败（確定）：%s", e)
+
+
+
+#目的選択
+
+try:
+    # 等待并点击 id="次頁" 的链接
+    link_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "nextButton"))
+    )
+    link_button.click()
+    logging.info("已点击链接按钮 '次頁'")
+
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//a[contains(text(), '硬式テニス')]"))
+    )
+
+    logging.info("已出现 硬式テニス")
+except Exception as e:
+    logging.exception("操作失败（次頁）：%s", e)
+
+
+
+
+# 点击“硬式テニス”按钮
+
+try:
+    # 等待并点击 "硬式テニス" 的链接
+    link_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), '硬式テニス')]"))
+    )
+    link_button.click()
+    logging.info("已点击链接按钮 '硬式テニス'")
+
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "id0"))
+    )
+
+    logging.info("已出现 哲学堂運動施設")
+except Exception as e:
+    logging.exception("操作失败（硬式テニス）：%s", e)
+
+
+
+
+# 点击“哲学堂運動施設”按钮
+
+try:
+    # 等待并点击 id="button2" 的链接
     link_button = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.ID, "id0"))
     )
     link_button.click()
-    logging.info("已点击链接按钮 'id0'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（id0）：%s", e)
+    logging.info("已点击按钮 '哲学堂運動施設'，进入新页面")
 
-# 点击 id 为 "button0" 的链接
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//a[@id='id0' and contains(@class, 'active')]"))
+    )
+
+    logging.info("点击成功，按钮已变为 'active' 状态")
+except Exception as e:
+    logging.exception("操作失败（哲学堂運動施設）：%s", e)
+
+# 点击“确定”按钮
 try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "btnOk"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '確定'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "button0")))
+    logging.info("已出现 庭球場第１コート")
+
+except Exception as e:
+    logging.exception("操作失败（確定）：%s", e)
+
+
+
+# 点击“全て”按钮
+
+try:
+    # 等待并点击 id="button2" 的链接
     link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "button0"))
+        EC.element_to_be_clickable((By.ID, "allChecked"))
     )
     link_button.click()
-    logging.info("已点击链接按钮 'button0'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（button0）：%s", e)
+    logging.info("已点击按钮 '全て'")
 
-# 点击 title 为 "テニス" 的链接
+    # **等待 class 变化，确保点击成功**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//a[@id='allChecked' and contains(@class, 'active')]"))
+    )
+
+    logging.info("点击成功，按钮已变为 'active' 状态")
+except Exception as e:
+    logging.exception("操作失败（全て）：%s", e)
+
+
+
+# 点击“确定”按钮
 try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[@title='テニス']"))
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-ok.gif')]"))
     )
-    link_button.click()
-    logging.info("已点击链接按钮 'テニス'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（テニス链接）：%s", e)
+    image_button.click()
+    logging.info("已点击按钮 '確定'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "filter-by-day")))
+    logging.info("已出现 曜日を絞る")
 
-# 选择所有复选框并点击“確定”按钮（选择一天空位）
+except Exception as e:
+    logging.exception("操作失败（確定）：%s", e)
+
+
+
+
+#表示開始日選択
+
+
+# 点击日期
+
+from datetime import datetime  # 修正导入
 try:
-    checkboxes = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.XPATH, "//input[@type='checkbox' and @name='chkbox']"))
+    """ # 获取今天的日期（格式：YYYYMMDD）
+    today_date = datetime.today().strftime("%Y%m%d")  # 修正这里
+    logging.info(f"今天的日期是：{today_date}")
+    """
+    today_date = 20250208
+    # 构造动态的 XPath 来匹配 `onclick="dateClick(..., YYYYMMDD)"`
+    date_xpath = f"//td[contains(@onclick, 'dateClick') and contains(@onclick, '{today_date}')]"
+
+    # 等待并点击今天的日期按钮
+    date_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, date_xpath))
     )
-    for checkbox in checkboxes:
-        if not checkbox.is_selected():
-            checkbox.click()
-    logging.info("已选中所有的曜日复选框（日、月、火、水、木、金、土、祝日）")
-    
-    ok_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "btnOK"))
+    date_button.click()
+    logging.info(f"已点击今天的日期按钮（{today_date})")
+
+    # **等待 class 变为 'active'**
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, f"{date_xpath}[contains(@class, 'active')]"))
     )
-    ok_button.click()
-    logging.info("已点击確定按钮，跳转至新页面 一天空位")
+
+    logging.info(f"日期按钮（{today_date}）已变为 active 状态")
 
 except Exception as e:
-    logging.exception("第一阶段操作失败：%s", e)
+    logging.exception("操作失败（日期选择）：%s", e)
 
-# 点击嵌入 <a> 标签中含有 <img> alt="施設別に切替" 的链接，进入一周空位页面
+
+
+#点击星期
+
 try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[img[@alt='施設別に切替']]"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 '施設別に切替'，进入新页面 一周空位")
-    WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.XPATH, "//*[@alt='日付別に切替']"))
-    )
-    logging.info("新页面加载完成，找到了 alt 为 '日付別に切替' 的元素。")
-    new_page_html = driver.page_source
-except Exception as e:
-    logging.exception("第二阶段操作失败：%s", e)
+    # 遍历 id="img0" 到 id="img7"
+    for i in range(8):
+        img_id = f"img{i}"
+        logging.info(f"尝试点击 {img_id}")
 
-# 4️⃣ 使用 BeautifulSoup 解析页面中显示一周空位的表格信息
+        # 等待元素可点击
+        img_element = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.ID, img_id))
+        )
+
+        # 点击元素
+        img_element.click()
+        logging.info(f"已点击 {img_id}")
+
+        # 可选：等待页面变化，确保点击生效（如果页面有明显变化）
+        time.sleep(1)  # 等待 1 秒，避免连续点击过快
+
+except Exception as e:
+    logging.exception("操作失败（点击 img0 - img7):%s", e)
+
+
+
+# 点击“确定”按钮
 try:
-    soup = BeautifulSoup(new_page_html, "html.parser")
-    # 从 <thead> 中提取时间段信息（第一个<th>为空，其余依次为各个时间段）
-    header_ths = soup.find("thead").find_all("th")
-    time_slots = []
-    for th in header_ths[1:]:
-        text = th.get_text(separator=" ", strip=True)
-        time_slots.append(text)
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-ok.gif')]"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '確定'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//img[contains(@src, '/stagia/jsp/images_jp/common/btn-nav-change.gif')]")))
+    logging.info("已出现 一周时间表示按钮")
 
-    availability_info = []
-    # 遍历所有 <tbody> 中的行
-    for tbody in soup.find_all("tbody"):
-        tr = tbody.find("tr")
-        if not tr:
-            continue
-        th_date = tr.find("th")
-        if not th_date:
-            continue
-        date_text = th_date.get_text(strip=True)
-        # 提取 m/d 格式的日期，如 "2/13"
-        match = re.search(r"(\d+/\d+)", date_text)
-        date_str = match.group(1) if match else date_text
-
-        tds = tr.find_all("td")
-        for i, td in enumerate(tds):
-            img = td.find("img")
-            # 当图片 alt 为 "O" 时表示该时间段有空位
-            if img and img.get("alt") == "O":
-                time_slot = time_slots[i] if i < len(time_slots) else "未知"
-                availability_info.append({"date": date_str, "time": time_slot})
-
-    # 定义辅助函数用于排序
-    def parse_date(date_str):
-        try:
-            return datetime.strptime("2023/" + date_str, "%Y/%m/%d")
-        except Exception:
-            return datetime.max
-
-    def parse_time_slot(time_str):
-        match = re.search(r"(\d{2}:\d{2})", time_str)
-        return match.group(1) if match else time_str
-
-    # 先按日期，再按时间段起始时间排序
-    availability_info.sort(key=lambda v: (parse_date(v["date"]), parse_time_slot(v["time"])))
-
-    for v in availability_info:
-        logging.info("空位信息 - 日期: %s, 时间段: %s", v["date"], v["time"])
 except Exception as e:
-    logging.exception("解析空位信息失败：%s", e)
-
-driver.quit()
+    logging.exception("操作失败（確定）：%s", e)
 
 
 
+import pandas as pd
+from selenium.common.exceptions import  TimeoutException, ElementNotInteractableException
 
+# 解析 HTML
 
-
-
-import smtplib
 import os
+import smtplib
+import logging
+import re
+import time
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from selenium.common.exceptions import ElementNotInteractableException
+from bs4 import BeautifulSoup
 
-sender_email = os.getenv("sender_email") # 你的 Gmail 地址
-receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-password = os.getenv("password")# Gmail 应用专用密码
-# 📩 **邮件发送函数**
-def send_email(subject, body):
+# 设置日志
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# WebDriver 解析页面
+all_available_slots = []
 
-    msg = MIMEMultipart()
-    msg["From"] = sender_email
-    msg['To'] = "<noreply@example.com>"
-    msg["Subject"] = subject
-    msg['Bcc'] = ', '.join(receiver_email) if isinstance(receiver_email, list) else receiver_email
+while True:  # 循环直到无法翻页
+    soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    msg.attach(MIMEText(body, "plain"))
+    # 获取当前日期
+    today_date_element = soup.select_one("li.day#li")
+    if today_date_element:
+        raw_date = today_date_element.get_text(strip=True)  # 例如 "令和07年2月8日(土)"
 
+        # 使用正则提取和转换日期
+        match = re.search(r"令和(\d+)年(\d+)月(\d+)日", raw_date)
+        if match:
+            reiwa_year, month, day = map(int, match.groups())
+            western_year = 2018 + reiwa_year  # 令和元年(2019)是西历2019
+            today_date = f"{western_year}-{month:02d}-{day:02d}"  # YYYY-MM-DD
+        else:
+            today_date = "未知日期"
+
+    logging.info(today_date)  # 输出格式化的日期，例如：2025-02-08
+
+    # 提取设施名称
+    facilities = [row.get_text(strip=True) for row in soup.select("tbody tr th strong")]
+
+    # 提取时间段
+    time_slots = [header.get_text(strip=True).replace("～", "-") for header in soup.select("thead tr th[id^='td10_']")]
+
+    # 提取空位信息
+    facility_rows = soup.select("tbody tr")
+
+    for facility_index, row in enumerate(facility_rows):
+        if facility_index >= len(facilities):
+            continue  # 防止索引超出范围
+        facility_name = facilities[facility_index]
+        cells = row.select("td[id^='td11_'], td[id^='td12_'], td[id^='td13_'], td[id^='td14_'], td[id^='td15_'], td[id^='td16_']")
+
+        for time_index, cell in enumerate(cells):
+            img = cell.find("img")
+            if img and "icon_timetable_sankaku.gif" in img["src"]:  # 只记录有空位的时间段
+                all_available_slots.append({
+                    "date": today_date,  # **改成英文键**
+                    "facility": facility_name,
+                    "time": time_slots[time_index]
+                })
+
+    # 尝试点击 "次へ" 按钮进入下一天
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(sender_email, password)
-        server.send_message(msg)
-        server.quit()
-        logging.info("📧 邮件发送成功")
-    except Exception as e:
-        logging.error(f"❌ 邮件发送失败: {e}")
+        next_button = driver.find_element("xpath", "//img[@alt='次へ']")
+        next_button.click()
+        time.sleep(1)  # 等待页面加载
+    except ElementNotInteractableException:
+        logging.info("已到达最后一天，停止获取。")
+        break
 
 # 📂 读取上次的预约信息
-last_file = "last_availability_tetsugaku.txt"
-if os.path.exists(last_file):
-    with open(last_file, "r", encoding="utf-8") as f:
+LAST_FILE = "last_availability_tetsugaku.txt"
+if os.path.exists(LAST_FILE):
+    with open(LAST_FILE, "r", encoding="utf-8") as f:
         last_availability_tetsugaku = f.read().strip()
 else:
     last_availability_tetsugaku = ""
 
-# 📌 定义曜日映射
-weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
+# **定义曜日映射**
+WEEKDAY_JAPANESE = ["月", "火", "水", "木", "金", "土", "日"]
 
-# 📝 **当前预约信息（排序后，带星期）**
-current_availability = "\n".join([
-    f"{entry['date']} ({weekday_japanese[datetime.strptime(entry['date'], '%m/%d').weekday()]}) | {entry['time']} | 可预约"
-    for entry in availability_info
-])
+# 🏸 **处理预约数据**
+if all_available_slots:
+    # 格式化当前预约信息（带星期）
+    current_availability = "\n".join([
+        f"{entry['date']} ({WEEKDAY_JAPANESE[datetime.strptime(entry['date'], '%Y-%m-%d').weekday()]}) | {entry['time']} | 可预约"
+        for entry in all_available_slots
+    ])
 
-# **确保 current_availability 不是空的**
-if current_availability:
-    # 📌 **比较新旧数据**
+    # 📌 比较新旧数据
     if current_availability.strip() != last_availability_tetsugaku.strip():
         logging.info("🔔 预约信息发生变化，发送邮件通知")
-        
+
         # **📩 发送邮件**
+        def send_email(subject, body):
+            sender_email = os.getenv("sender_email") # 你的 Gmail 地址
+            receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
+            password = os.getenv("password")# Gmail 应用专用密码
+
+            msg = MIMEMultipart()
+            msg["From"] = sender_email
+            msg["To"] = "<noreply@example.com>"
+            msg["Subject"] = subject
+            msg["Bcc"] = ', '.join(receiver_email) if isinstance(receiver_email, list) else receiver_email
+            msg.attach(MIMEText(body, "plain"))
+
+            try:
+                server = smtplib.SMTP("smtp.gmail.com", 587)
+                server.starttls()
+                server.login(sender_email, password)
+                server.send_message(msg)
+                server.quit()
+                logging.info("📧 邮件发送成功")
+            except Exception as e:
+                logging.error(f"❌ 邮件发送失败: {e}")
+
         email_subject = "🏸 哲学堂-网球场预约更新通知"
         email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
         send_email(email_subject, email_body)
 
-        # **📂 更新 `last_availability_tetsugaku.txt`**
-        with open(last_file, "w", encoding="utf-8") as f:
+        # 📂 更新 `last_availability_tetsugaku.txt`
+        with open(LAST_FILE, "w", encoding="utf-8") as f:
             f.write(current_availability)
+
     else:
         logging.info("✅ 预约信息无变化，不发送邮件")
 else:
-    logging.warning("❌ 没有找到新的可预约时间，文件不会被更新")
+    logging.warning("❌ 未找到任何可预约信息")
+
+# 关闭 WebDriver
+driver.quit()
