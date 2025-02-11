@@ -14,9 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
-import itertools
-
-load_dotenv("/root/tenniscourt/config.env", override=True)
+load_dotenv("/root/tenniscourt/config.env", override = True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
@@ -421,16 +419,11 @@ if all_available_slots:
     if current_availability.strip() != last_availability_kamitakada.strip():
         logging.info("🔔 预约信息发生变化，发送邮件通知")
 
-        # 读取环境变量中的发送邮箱
-        sender_emails = os.getenv("sender_emails").split(",")  # 例如 "email1@gmail.com,email2@gmail.com"
-        passwords = os.getenv("passwords").split(",")  # 对应的应用专用密码 "password1,password2"
-
-        # 轮流使用邮箱
-        email_cycle = itertools.cycle(zip(sender_emails, passwords))  # 交替使用邮箱和密码
-
+        # **📩 发送邮件**
         def send_email(subject, body):
-            sender_email, password = next(email_cycle)  # 获取当前轮流的邮箱和密码
-            receiver_email = os.getenv("receiver_email").split(",")  # 收件人邮箱
+            sender_email2 = os.getenv("sender_email2") # 你的 Gmail 地址
+            receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
+            password2 = os.getenv("password2")# Gmail 应用专用密码
 
             msg = MIMEMultipart()
             msg["From"] = sender_email
