@@ -394,6 +394,10 @@ while True:  # 循环直到无法翻页
     except ElementNotInteractableException:
         logging.info("已到达最后一天，停止获取。")
         break
+
+
+logging.info(all_available_slots)
+
 import jpholiday
 
 # 筛选符合条件的预约信息
