@@ -379,9 +379,9 @@ while True:  # 循环直到无法翻页
 
         for time_index, cell in enumerate(cells):
             img = cell.find("img")
-            if img and "icon_timetable_sankaku.gif" in img["src"]:  # 只记录有空位的时间段
+            if img and any(keyword in img["src"] for keyword in ["icon_timetable_sankaku.gif", "icon_timetable_O.gif"]):
                 all_available_slots.append({
-                    "date": today_date,  # **改成英文键**
+                    "date": today_date,  # **使用英文键**
                     "facility": facility_name,
                     "time": time_slots[time_index]
                 })
