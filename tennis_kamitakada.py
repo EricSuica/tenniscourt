@@ -410,7 +410,7 @@ for slot in all_available_slots:
     is_holiday = jpholiday.is_holiday(date_obj) or weekday in [5, 6]  # 周六 (5) / 周日 (6) 也是祝休日
 
     # 平日筛选 19:00-21:00
-    if not is_holiday and time_range in ["19:00-20:00", "20:00-21:00"]:
+    if not is_holiday and time_range in ["19:00-21:00"]:
         partial_available_slots.append(slot)
 
     # 祝休日保留所有时段
