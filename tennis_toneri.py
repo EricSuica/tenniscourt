@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from datetime import datetime
-load_dotenv("/root/tenniscourt/config.env")
+load_dotenv("/root/tenniscourt/config.env", override=True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 
@@ -259,9 +259,9 @@ from email.mime.multipart import MIMEMultipart
 
 # 📩 **邮件发送函数**
 def send_email(subject, body):
-    sender_email = os.getenv("sender_email") # 你的 Gmail 地址
+    sender_email = os.getenv("sender_email2") # 你的 Gmail 地址
     receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-    password = os.getenv("password")# Gmail 应用专用密码
+    password = os.getenv("password2")# Gmail 应用专用密码
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
