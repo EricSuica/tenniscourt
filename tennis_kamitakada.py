@@ -438,7 +438,7 @@ if partial_available_slots:
     # 格式化当前预约信息（带星期）
     current_availability = "\n".join([
         f"{entry['date']} ({WEEKDAY_JAPANESE[datetime.strptime(entry['date'], '%Y-%m-%d').weekday()]}) | {entry['time']} | 可预约"
-        for entry in all_available_slots
+        for entry in partial_available_slots
     ])
 
     # 📌 比较新旧数据
