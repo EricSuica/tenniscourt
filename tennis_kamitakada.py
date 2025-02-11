@@ -16,7 +16,7 @@ import jpholiday
 from bs4 import BeautifulSoup
 import itertools
 
-load_dotenv("/root/tenniscourt/config.env")
+load_dotenv("/root/tenniscourt/config.env", override=True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
