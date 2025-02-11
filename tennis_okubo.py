@@ -155,7 +155,9 @@ try:
 except Exception as e:
     logging.exception("第二阶段操作失败：%s", e)
 
+
 # 4️⃣ 使用 BeautifulSoup 解析页面中显示一周空位的表格信息
+availability_info = []
 try:
     soup = BeautifulSoup(new_page_html, "html.parser")
     # 从 <thead> 中提取时间段信息（第一个<th>为空，其余依次为各个时间段）
@@ -165,7 +167,6 @@ try:
         text = th.get_text(separator=" ", strip=True)
         time_slots.append(text)
 
-    availability_info = []
     # 遍历所有 <tbody> 中的行
     for tbody in soup.find_all("tbody"):
         tr = tbody.find("tr")
