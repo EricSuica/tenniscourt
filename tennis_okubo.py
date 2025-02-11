@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
-load_dotenv("/root/tenniscourt/config.env")
+load_dotenv("/root/tenniscourt/config.env", override=True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 # 配置日志输出到文件
@@ -219,9 +219,9 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-sender_email = os.getenv("sender_email") # 你的 Gmail 地址
+sender_email2 = os.getenv("sender_email2") # 你的 Gmail 地址
 receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-password = os.getenv("password")# Gmail 应用专用密码
+password2 = os.getenv("password2")# Gmail 应用专用密码
 # 📩 **邮件发送函数**
 def send_email(subject, body):
 
