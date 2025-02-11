@@ -157,8 +157,8 @@ except Exception as e:
 
 
 # 4️⃣ 使用 BeautifulSoup 解析页面中显示一周空位的表格信息
-availability_info = []
 try:
+    availability_info = []
     soup = BeautifulSoup(new_page_html, "html.parser")
     # 从 <thead> 中提取时间段信息（第一个<th>为空，其余依次为各个时间段）
     header_ths = soup.find("thead").find_all("th")
