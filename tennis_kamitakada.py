@@ -190,7 +190,7 @@ try:
 
     # **等待 class 变化，确保点击成功**
     WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, "//a[@id='id0' and contains(@class, 'active')]"))
+        EC.presence_of_element_located((By.XPATH, "//a[@id='id1' and contains(@class, 'active')]"))
     )
 
     logging.info("点击成功，按钮已变为 'active' 状态")
