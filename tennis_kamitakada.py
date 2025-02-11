@@ -395,7 +395,6 @@ while True:  # 循环直到无法翻页
     except ElementNotInteractableException:
         logging.info("已到达最后一天，停止获取。")
         break
-logging.info("🎾 筛选前的全部空位信息（all_available_slots）：")
 
 import jpholiday
 
