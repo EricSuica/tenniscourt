@@ -394,7 +394,33 @@ while True:  # 循环直到无法翻页
     except ElementNotInteractableException:
         logging.info("已到达最后一天，停止获取。")
         break
+import jpholiday
 
+# 筛选符合条件的预约信息
+partial_available_slots = []
+
+for slot in all_available_slots:
+    date_str = slot["date"]  # 格式为 YYYY-MM-DD
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+    weekday = date_obj.weekday()  # 0=Monday, ..., 6=Sunday
+    time_range = slot["time"]
+
+    # 判断是否为祝休日（包括周六、周日）
+    is_holiday = jpholiday.is_holiday(date_obj) or weekday in [5, 6]  # 周六 (5) / 周日 (6) 也是祝休日
+
+    # 平日筛选 19:00-21:00
+    if not is_holiday and time_range in ["19:00-20:00", "20:00-21:00"]:
+        partial_available_slots.append(slot)
+
+    # 祝休日保留所有时段
+    if is_holiday:
+        partial_available_slots.append(slot)
+
+# 打印筛选后的可预约时间
+logging.info("🎾 筛选后的部分空位信息（partial_available_slots）：")
+for slot in partial_available_slots:
+    logging.info(f"{slot['date']} | {slot['facility']} | {slot['time']}")
+    
 # 📂 读取上次的预约信息
 LAST_FILE = "last_availability_tetsugaku.txt"
 if os.path.exists(LAST_FILE):
@@ -407,11 +433,11 @@ else:
 WEEKDAY_JAPANESE = ["月", "火", "水", "木", "金", "土", "日"]
 
 # 🏸 **处理预约数据**
-if all_available_slots:
+if partial_available_slots:
     # 格式化当前预约信息（带星期）
     current_availability = "\n".join([
         f"{entry['date']} ({WEEKDAY_JAPANESE[datetime.strptime(entry['date'], '%Y-%m-%d').weekday()]}) | {entry['time']} | 可预约"
-        for entry in all_available_slots
+        for entry in partial_available_slots
     ])
 
     # 📌 比较新旧数据
