@@ -219,9 +219,9 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-sender_email2 = os.getenv("sender_email2") # 你的 Gmail 地址
+sender_email = os.getenv("sender_email2") # 你的 Gmail 地址
 receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-password2 = os.getenv("password2")# Gmail 应用专用密码
+password = os.getenv("password2")# Gmail 应用专用密码
 # 📩 **邮件发送函数**
 def send_email(subject, body):
 
