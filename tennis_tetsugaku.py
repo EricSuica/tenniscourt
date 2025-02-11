@@ -396,7 +396,6 @@ while True:  # 循环直到无法翻页
         break
 
 
-logging.info(all_available_slots)
 
 import jpholiday
 
