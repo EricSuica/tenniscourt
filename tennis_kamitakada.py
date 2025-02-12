@@ -408,7 +408,8 @@ for slot in all_available_slots:
     time_range = slot["time"]
 
     # 判断是否为祝休日（包括周六、周日）
-    is_holiday = jpholiday.is_holiday(date_obj) in [5, 6]  # 周六 (5) / 周日 (6) 也是祝休日
+    is_holiday = jpholiday.is_holiday(date_obj) or weekday in [5, 6]  # 周六 (5) / 周日 (6) 也是祝休日
+
 
     # 祝休日保留所有时段
     if is_holiday:
