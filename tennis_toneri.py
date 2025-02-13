@@ -192,56 +192,74 @@ if partially_available_dates == []:
 # **存储所有空位信息**
 availability_info = {}
 
+
 # 1️⃣4️⃣ **点击可预约的日期**
 for date in available_dates + partially_available_dates:
     logging.info(f"尝试点击日期：{date[:4]}年{date[4:6]}月{date[6:]}日")
 
-    try:
-        date_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, f"month_{date}"))
-        )  # 确保元素存在
+    attempt = 0
+    max_attempts = 3  # 允许最多重试 3 次
 
-        date_element = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, f"month_{date}"))
-        )  # 再次确保可点击
-        date_element.click()
-        logging.info(f"成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+    while attempt < max_attempts:
+        try:
+            attempt += 1
+            logging.info(f"🔄 尝试第 {attempt} 次点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
 
-        # ✅ **等待 `week-info` 确保时间段已加载**
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.ID, "week-info"))
-        )
-        logging.info(f"{date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
+            # 重新获取元素，确保元素有效
+            date_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, f"month_{date}"))
+            )
 
-        # **获取最新 HTML**
-        time.sleep(10)  # **短暂等待 JS 渲染**
-        html_after_click = driver.execute_script("return document.body.outerHTML;")
+            date_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.ID, f"month_{date}"))
+            )
+            date_element.click()
+            logging.info(f"✅ 成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
 
-        # **先清理当前日期的旧数据，防止错误数据残留**
-        availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
+            # ✅ **等待 `week-info` 确保时间段已加载**
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.ID, "week-info"))
+            )
+            logging.info(f"✅ {date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
 
-        # **解析新数据**
-        pattern_slots = re.compile(
-            r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
-            re.S
-        )
+            # **获取最新 HTML**
+            time.sleep(2)  # **短暂等待 JS 渲染**
+            html_after_click = driver.execute_script("return document.body.outerHTML;")
 
-        for match in pattern_slots.finditer(html_after_click):
-            slot_date, slot_suffix, available_count = match.groups()
+            # **先清理当前日期的旧数据，防止错误数据残留**
+            availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
 
-            # **只存入当前点击的日期，不存入其他日期**
-            if slot_date == date:
-                slot_time = {
-                    "10": "9-11点", "20": "11-13点",
-                    "30": "13-15点", "40": "15-17点", "50": "17-19点", "60": "19-21点"
-                }.get(slot_suffix, "未知时间段")
+            # **解析新数据**
+            pattern_slots = re.compile(
+                r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
+                re.S
+            )
 
-                availability_info[(slot_date, slot_time)] = available_count
+            for match in pattern_slots.finditer(html_after_click):
+                slot_date, slot_suffix, available_count = match.groups()
 
-    except TimeoutException:
-        logging.error(f"无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
-    except StaleElementReferenceException:
-        logging.warning("⚠️ 目标元素失效，正在重新获取...")
+                # **只存入当前点击的日期，不存入其他日期**
+                if slot_date == date:
+                    slot_time = {
+                        "10": "9-11点", "20": "11-13点",
+                        "30": "13-15点", "40": "15-17点",
+                        "50": "17-19点", "60": "19-21点"
+                    }.get(slot_suffix, "未知时间段")
+
+                    availability_info[(slot_date, slot_time)] = available_count
+
+            break  # 成功后退出循环
+
+        except StaleElementReferenceException:
+            logging.warning(f"⚠️ 目标元素失效，第 {attempt} 次重试 {date[:4]}年{date[4:6]}月{date[6:]}日...")
+            time.sleep(1)  # 短暂等待，避免频繁请求
+
+        except TimeoutException:
+            logging.error(f"❌ 无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+            break  # 超时错误，终止当前日期的尝试
+
+
+
 # **最终汇总**
 logging.info("所有可预约时间段:")
 for (date, time_slot), count in availability_info.items():
