@@ -166,7 +166,11 @@ try:
     image_button.click()
     logging.info("已点击按钮 '下月'，进入新页面")
     month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
-    logging.info("已出现 下月信息", month_element )
+    # 获取 `month-head` 的文本
+    month_text = month_element.text
+
+    # 记录日志
+    logging.info(f"✅ 已出现 下月信息: {month_text}")
 
 except Exception as e:
     logging.exception("操作失败（下月）：%s", e)
