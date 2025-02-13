@@ -14,6 +14,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 import jpholiday
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import StaleElementReferenceException
+
 load_dotenv("/root/tenniscourt/config.env", override=True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
@@ -39,25 +41,14 @@ service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
 # 访问主页并确保加载成功
-url = "https://user.shinjuku-shisetsu-yoyaku.jp/regasu/reserve/gin_menu"
+url = "https://www.shinjuku.eprs.jp/regasu/web/"
 while True:
     driver.get(url)
     try:
         WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "contents"))
+            EC.visibility_of_element_located((By.ID, "btn-go"))
         )
         logging.info("主页加载成功")
-
-        # 休息日检查
-        try:
-            inner_content = driver.find_element(By.ID, "inner-contents").text
-            if "本日はサービス休止日となっております" in inner_content:
-                logging.warning("⚠️ 今日是服务休止日，程序终止。")
-                driver.quit()
-                exit(0)  # 终止程序
-        except NoSuchElementException:
-            logging.info("✅ 未发现休止日提示，继续执行。")
-
         break  # 成功加载主页且不是休止日，跳出循环
     except TimeoutException:
         logging.warning("主页加载超时，正在刷新...")
@@ -67,160 +58,329 @@ logging.info("搜索按钮加载成功")
 
 
 # 3️⃣ 依次点击页面中的各个按钮或链接
-
-# 点击“かんたん操作”按钮
+# 点击“1か月”按钮
 try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='image' and @alt='かんたん操作']"))
+    one_month_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//label[@class='btn radiobtn' and @for='thismonth']"))
     )
-    image_button.click()
-    logging.info("已点击按钮 'かんたん操作'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+    one_month_button.click()
+    logging.info("已点击按钮 '1か月'")
 except Exception as e:
-    logging.exception("操作失败（かんたん操作按钮）：%s", e)
+    logging.exception("操作失败(1か月按钮):%s", e)
 
-# 点击“空き状況確認”按钮
+# “选择大久保スポーツプラザ（庭球場）”
 try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='image' and @alt='空き状況確認']"))
+    # 等待 select 元素加载
+    select_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "bname"))
     )
-    image_button.click()
-    logging.info("已点击按钮 '空き状況確認'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（空き状況確認按钮）：%s", e)
 
-# 点击 id 为 "button3" 的链接
-try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "button3"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 'button3'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（button3）：%s", e)
+    # 创建 Select 对象
+    select = Select(select_element)
 
-# 点击 id 为 "id0" 的链接
-try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "id0"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 'id0'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（id0）：%s", e)
+    # 选择 "大久保スポーツプラザ（庭球場）"
+    select.select_by_visible_text("大久保スポーツプラザ（庭球場）")
 
-# 点击 id 为 "button0" 的链接
-try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "button0"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 'button0'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（button0）：%s", e)
-
-# 点击 title 为 "テニス" 的链接
-try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[@title='テニス']"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 'テニス'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-except Exception as e:
-    logging.exception("操作失败（テニス链接）：%s", e)
-
-# 选择所有复选框并点击“確定”按钮（选择一天空位）
-try:
-    checkboxes = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.XPATH, "//input[@type='checkbox' and @name='chkbox']"))
-    )
-    for checkbox in checkboxes:
-        if not checkbox.is_selected():
-            checkbox.click()
-    logging.info("已选中所有的曜日复选框（日、月、火、水、木、金、土、祝日）")
+    logging.info("已选择 '大久保スポーツプラザ（庭球場）'")
     
-    ok_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "btnOK"))
+    # 等待页面更新
+    WebDriverWait(driver, 10).until(
+        EC.text_to_be_present_in_element(
+            (By.XPATH, "//div[@id='searchCondition']/span"),
+            "大久保スポーツプラザ（庭球場）"
+        )
     )
-    ok_button.click()
-    logging.info("已点击確定按钮，跳转至新页面 一天空位")
+except Exception as e:
+    logging.exception("操作失败（选择 '大久保スポーツプラザ（庭球場）'):%s", e)
+
+
+# 点击“搜索“按钮
+try:
+    search_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "btn-go"))
+    )
+    search_button.click()
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "week-info")))
+    logging.info("已点击按钮 '搜索',并进入新页面，并成功获取周空位信息")
+except Exception as e:
+    logging.exception("操作失败(搜索):%s", e)
+
+# 点击“月表示“按钮
+try:
+    # 等待并点击 "月表示" 按钮
+    monthly_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-light' and @data-target='#monthly']"))
+    )
+    monthly_button.click()
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "loadedmonth")))
+    logging.info("已点击 '月表示' 按钮，并成功获取月份信息")
 
 except Exception as e:
-    logging.exception("第一阶段操作失败：%s", e)
-
-# 点击嵌入 <a> 标签中含有 <img> alt="施設別に切替" 的链接，进入一周空位页面
-try:
-    link_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[img[@alt='施設別に切替']]"))
-    )
-    link_button.click()
-    logging.info("已点击链接按钮 '施設別に切替'，进入新页面 一周空位")
-    WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.XPATH, "//*[@alt='日付別に切替']"))
-    )
-    logging.info("新页面加载完成，找到了 alt 为 '日付別に切替' 的元素。")
-    new_page_html = driver.page_source
-except Exception as e:
-    logging.exception("第二阶段操作失败：%s", e)
+    logging.exception("点击 '月表示' 按钮失败：%s", e)
 
 
-# 4️⃣ 使用 BeautifulSoup 解析页面中显示一周空位的表格信息
-try:
-    availability_info = []
-    soup = BeautifulSoup(new_page_html, "html.parser")
-    # 从 <thead> 中提取时间段信息（第一个<th>为空，其余依次为各个时间段）
-    header_ths = soup.find("thead").find_all("th")
-    time_slots = []
-    for th in header_ths[1:]:
-        text = th.get_text(separator=" ", strip=True)
-        time_slots.append(text)
+# **获取当前 HTML 页面**
+html_current = driver.execute_script("return document.body.outerHTML;")
+month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+# 获取 `month-head` 的文本
+month_text = month_element.text
 
-    # 遍历所有 <tbody> 中的行
-    for tbody in soup.find_all("tbody"):
-        tr = tbody.find("tr")
-        if not tr:
-            continue
-        th_date = tr.find("th")
-        if not th_date:
-            continue
-        date_text = th_date.get_text(strip=True)
-        # 提取 m/d 格式的日期，如 "2/13"
-        match = re.search(r"(\d+/\d+)", date_text)
-        date_str = match.group(1) if match else date_text
+# ✅ **使用正则表达式提取当月可预约的日期**
+available_dates = []
+partially_available_dates = []
 
-        tds = tr.find_all("td")
-        for i, td in enumerate(tds):
-            img = td.find("img")
-            # 当图片 alt 为 "O" 时表示该时间段有空位
-            if img and img.get("alt") == "O":
-                time_slot = time_slots[i] if i < len(time_slots) else "未知"
-                availability_info.append({"date": date_str, "time": time_slot})
+pattern = re.compile(
+    r'<td id="month_(\d+)"[^>]*?>.*?<img[^>]*?class="calendar-status"[^>]*?alt="(全て空き|一部空き)"',
+    re.S
+)
+for match in pattern.finditer(html_current):
+    date_number = match.group(1)
+    status = match.group(2)
 
-    # 定义辅助函数用于排序
-    def parse_date(date_str):
+    if status == "全て空き":
+        available_dates.append(date_number)
+    elif status == "一部空き":
+        partially_available_dates.append(date_number)
+
+
+
+logging.info(f"{month_text}可预约的日期（完全空闲）：{available_dates}")
+logging.info(f"{month_text}可预约的日期（部分空闲）：{partially_available_dates}")
+
+"""
+# 🎌 **过滤掉非休日 & 非祝日的日期**
+def is_holiday_or_weekend(date_str):
+    #检查日期是否为日本的周六、周日或祝日
+    date_obj = datetime.strptime(date_str, "%Y%m%d")
+    return date_obj.weekday() in [5, 6] or jpholiday.is_holiday(date_obj)
+
+available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
+partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
+
+logging.info(f"{month_text}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
+
+"""
+
+if partially_available_dates == []:
+    logging.warning(f"{month_text}⚠️ 未找到空位，程序终止。")
+    driver.quit()
+    exit(0)  # 终止程序
+    
+
+# **存储所有空位信息**
+availability_info = {}
+
+
+# 1️⃣4️⃣ **点击可预约的日期**
+for date in available_dates + partially_available_dates:
+    logging.info(f"尝试点击日期：{date[:4]}年{date[4:6]}月{date[6:]}日")
+
+    attempt = 0
+    max_attempts = 3  # 允许最多重试 3 次
+
+    while attempt < max_attempts:
         try:
-            return datetime.strptime("2025/" + date_str, "%Y/%m/%d")
-        except Exception:
-            return datetime.max
+            attempt += 1
+            logging.info(f"🔄 尝试第 {attempt} 次点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
 
-    def parse_time_slot(time_str):
-        match = re.search(r"(\d{2}:\d{2})", time_str)
-        return match.group(1) if match else time_str
+            # 重新获取元素，确保元素有效
+            date_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, f"month_{date}"))
+            )
 
-    # 先按日期，再按时间段起始时间排序
-    availability_info.sort(key=lambda v: (parse_date(v["date"]), parse_time_slot(v["time"])))
+            date_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.ID, f"month_{date}"))
+            )
+            date_element.click()
+            logging.info(f"✅ 成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+            time.sleep(2)  # **短暂等待 JS 渲染**
+            
+            # ✅ **等待 `week-info` 确保时间段已加载**
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.ID, "week-info"))
+            )
+            logging.info(f"✅ {date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
 
-    for v in availability_info:
-        logging.info("空位信息 - 日期: %s, 时间段: %s", v["date"], v["time"])
+            # **获取最新 HTML**
+            html_after_click = driver.execute_script("return document.body.outerHTML;")
+
+            # **先清理当前日期的旧数据，防止错误数据残留**
+            availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
+
+            # **解析新数据**
+            pattern_slots = re.compile(
+                r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
+                re.S
+            )
+
+            for match in pattern_slots.finditer(html_after_click):
+                slot_date, slot_suffix, available_count = match.groups()
+
+                # **只存入当前点击的日期，不存入其他日期**
+                if slot_date == date:
+                    slot_time = {
+                        "10": "9:00-11:30", "20": "11:30-13:30",
+                        "30": "13:30-15:30", "40": "15:30-17:30",
+                        "50": "17:30-19:30", "60": "19:30-22:00"
+                    }.get(slot_suffix, "未知时间段")
+
+                    availability_info[(slot_date, slot_time)] = available_count
+
+            break  # 成功后退出循环
+
+        except StaleElementReferenceException:
+            logging.warning(f"⚠️ 目标元素失效，第 {attempt} 次重试 {date[:4]}年{date[4:6]}月{date[6:]}日...")
+            time.sleep(1)  # 短暂等待，避免频繁请求
+
+        except TimeoutException:
+            logging.error(f"❌ 无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+            driver.quit()
+            exit(0)  # 终止程序
+
+
+# 点击“下月”按钮
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "next-month"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '下月'，进入新页面")
+    time.sleep(5)  # **短暂等待 JS 渲染**
+
+    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    # 获取 `month-head` 的文本
+    month_text = month_element.text
+
+    # 记录日志
+    logging.info(f"✅ 已出现 下月信息: {month_text}")
+
 except Exception as e:
-    logging.exception("解析空位信息失败：%s", e)
+    logging.exception("操作失败（下月）：%s", e)
+
+# **获取下月 HTML 页面**
+html_next_month = driver.execute_script("return document.body.outerHTML;")
+
+# **正则表达式匹配 下月可预约的日期**
+pattern = re.compile(
+    r'<td id="month_(\d+)"[^>]*?>.*?<img[^>]*?class="calendar-status"[^>]*?alt="(全て空き|一部空き)"',
+    re.S
+)
+# **使用正则表达式提取下月可预约的日期**
+matches = list(pattern.finditer(html_next_month))  # 先把匹配项存入列表
+
+available_dates = []
+partially_available_dates = []
+
+if not matches:  # 如果 `matches` 为空
+    logging.info(f"⚠️ {month_text} 空位未开放查询")
+else:
+    for match in matches:
+        date_number = match.group(1)
+        status = match.group(2)
+
+        if status == "全て空き":
+            available_dates.append(date_number)
+        elif status == "一部空き":
+            partially_available_dates.append(date_number)
+
+if available_dates != []:
+    logging.info(f"{month_text}可预约的日期（完全空闲）：{available_dates}")
+    logging.info(f"{month_text}可预约的日期（部分空闲）：{partially_available_dates}")
+    
+    """
+    # 🎌 **过滤掉非休日 & 非祝日的日期**
+    def is_holiday_or_weekend(date_str):
+        #检查日期是否为日本的周六、周日或祝日
+        date_obj = datetime.strptime(date_str, "%Y%m%d")
+        return date_obj.weekday() in [5, 6] or jpholiday.is_holiday(date_obj)
+    
+    available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
+    partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
+    
+    logging.info(f"{month_text}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+    logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
+    """
+    
+    
+    
+    # 1️⃣4️⃣ **点击可预约的日期**
+    for date in available_dates + partially_available_dates:
+        logging.info(f"尝试点击日期：{date[:4]}年{date[4:6]}月{date[6:]}日")
+
+        attempt = 0
+        max_attempts = 3  # 允许最多重试 3 次
+
+        while attempt < max_attempts:
+            try:
+                attempt += 1
+                logging.info(f"🔄 尝试第 {attempt} 次点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+
+                # 重新获取元素，确保元素有效
+                date_element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, f"month_{date}"))
+                )
+
+                date_element = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, f"month_{date}"))
+                )
+                date_element.click()
+                logging.info(f"✅ 成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+                time.sleep(2)  # **短暂等待 JS 渲染**
+                
+                # ✅ **等待 `week-info` 确保时间段已加载**
+                WebDriverWait(driver, 30).until(
+                    EC.presence_of_element_located((By.ID, "week-info"))
+                )
+                logging.info(f"✅ {date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
+
+                # **获取最新 HTML**
+                html_after_click = driver.execute_script("return document.body.outerHTML;")
+
+                # **先清理当前日期的旧数据，防止错误数据残留**
+                availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
+
+                # **解析新数据**
+                pattern_slots = re.compile(
+                    r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
+                    re.S
+                )
+
+                for match in pattern_slots.finditer(html_after_click):
+                    slot_date, slot_suffix, available_count = match.groups()
+
+                    # **只存入当前点击的日期，不存入其他日期**
+                    if slot_date == date:
+                        slot_time = {
+                            "10": "9:00-11:30", "20": "11:30-13:30",
+                            "30": "13:30-15:30", "40": "15:30-17:30",
+                            "50": "17:30-19:30", "60": "19:30-22:00"
+                        }.get(slot_suffix, "未知时间段")
+
+                        availability_info[(slot_date, slot_time)] = available_count
+
+                break  # 成功后退出循环
+
+            except StaleElementReferenceException:
+                logging.warning(f"⚠️ 目标元素失效，第 {attempt} 次重试 {date[:4]}年{date[4:6]}月{date[6:]}日...")
+                time.sleep(1)  # 短暂等待，避免频繁请求
+
+            except TimeoutException:
+                logging.error(f"❌ 无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+                driver.quit()
+                exit(0)  # 终止程序
+
+
+
+# **最终汇总**
+logging.info("所有可预约时间段:")
+for (date, time_slot), count in availability_info.items():
+    logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
 
 driver.quit()
+
+
+
 
 
 
@@ -233,12 +393,11 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-sender_email = os.getenv("sender_email2") # 你的 Gmail 地址
-receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
-password = os.getenv("password2")# Gmail 应用专用密码
 # 📩 **邮件发送函数**
 def send_email(subject, body):
-
+    sender_email = os.getenv("sender_email2") # 你的 Gmail 地址
+    receiver_email = os.getenv("receiver_email").split(",") # 收件人邮箱
+    password = os.getenv("password2")# Gmail 应用专用密码
 
     msg = MIMEMultipart()
     msg["From"] = sender_email
@@ -258,38 +417,49 @@ def send_email(subject, body):
     except Exception as e:
         logging.error(f"❌ 邮件发送失败: {e}")
 
-# 📂 读取上次的预约信息
+# 📂 **读取上次的预约信息**
 last_file = "last_availability_okubo.txt"
 if os.path.exists(last_file):
     with open(last_file, "r", encoding="utf-8") as f:
-        last_availability_okubo = f.read().strip()
+        last_availability_okubo = f.read()
 else:
     last_availability_okubo = ""
 
-# 📌 定义曜日映射
-weekday_japanese = ["水", "木", "金", "土", "日", "月", "火"]
+# 📌 **按照 日期 和 时间 进行排序**
+time_order = {
+    "9:00-11:30": 1, "11:30-13:30": 2,
+    "13:30-15:30": 3, "15:30-17:30": 4, "17:30-19:30": 5, "19:30-22:00": 6
+}
+
+sorted_availability = sorted(
+    availability_info.items(),
+    key=lambda x: (x[0][0], time_order.get(x[0][1], 99))  # 先按日期排序，再按时间排序
+)
+
+from datetime import datetime
+
+# 📌 **定义曜日映射**
+weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
 
 # 📝 **当前预约信息（排序后，带星期）**
 current_availability = "\n".join([
-    f"{entry['date']} ({weekday_japanese[datetime.strptime(entry['date'], '%m/%d').weekday()]}) | {entry['time']} | 可预约"
-    for entry in availability_info
+    f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot} | 可预约：{count} 人"
+    for (date, time_slot), count in sorted_availability
 ])
 
-# **确保 current_availability 不是空的**
-if current_availability:
-    # 📌 **比较新旧数据**
-    if current_availability.strip() != last_availability_okubo.strip():
-        logging.info("🔔 预约信息发生变化，发送邮件通知")
-        
-        # **📩 发送邮件**
-        email_subject = "🏸 大久保-网球场预约更新通知"
-        email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
-        send_email(email_subject, email_body)
+# 📌 **比较新旧数据**
+if current_availability.strip() != last_availability_okubo.strip():
+    logging.info("🔔 预约信息发生变化，发送邮件通知")
+    
+    # **📩 发送邮件**
+    email_subject = "🏸 大久保-网球场预约更新通知"
+    email_body = "本次查询到的可预约时间如下：\n\n" + current_availability
+    send_email(email_subject, email_body)
 
-        # **📂 更新 `last_availability_okubo.txt`**
-        with open(last_file, "w", encoding="utf-8") as f:
-            f.write(current_availability)
-    else:
-        logging.info("✅ 预约信息无变化，不发送邮件")
+    # **📂 更新 `last_availability_okubo.txt`**
+    with open(last_file, "w", encoding="utf-8") as f:
+        f.write(current_availability)
 else:
-    logging.warning("❌ 没有找到新的可预约时间，文件不会被更新")
+    logging.info("✅ 预约信息无变化，不发送邮件")
+
+
