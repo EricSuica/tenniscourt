@@ -165,6 +165,8 @@ try:
     )
     image_button.click()
     logging.info("已点击按钮 '下月'，进入新页面")
+    time.sleep(10)  # **短暂等待 JS 渲染**
+
     month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
     # 获取 `month-head` 的文本
     month_text = month_element.text
