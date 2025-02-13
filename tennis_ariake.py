@@ -179,11 +179,9 @@ except Exception as e:
     
 # **获取下月 HTML 页面**
 html_next_month = driver.execute_script("return document.body.outerHTML;")
+
 # **获取下月 空位信息**
 pattern_next = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
-
-# 使用正则表达式提取月份信息
-match_next = re.search(r'<span class="month-date-middle[^"]*" id="month-head">(\d{4})年(\d{1,2})月</span>', html_next_month)
     
 # ✅ **使用正则表达式提取下月可预约的日期**
 
