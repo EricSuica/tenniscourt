@@ -157,17 +157,6 @@ for match in pattern.finditer(html_before_click):
         available_dates.append(date_number)
     elif status == "一部空き":
         partially_available_dates.append(date_number)
-
-
-# 使用正则表达式提取月份信息
-match_current = re.search(r'<span class="month-date-middle[^"]*" id="month-head">(\d{4})年(\d{1,2})月</span>', html_before_click)
-
-if match_current:
-    year = int(match_current.group(1))  # 提取年份（2025）
-    current_month = int(match_current.group(2))  # 提取月份（2）
-    logging.info(f"当前年份: {year}, 当前月份: {current_month}")
-else:
-    logging.info("❌ 未能解析月份信息")
     
 # 点击“下月”按钮
 try:
