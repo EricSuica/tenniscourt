@@ -242,9 +242,8 @@ for date in available_dates + partially_available_dates:
                 # **只存入当前点击的日期，不存入其他日期**
                 if slot_date == date:
                     slot_time = {
-                        "10": "9-11点", "20": "11-13点",
-                        "30": "13-15点", "40": "15-17点",
-                        "50": "17-19点", "60": "19-21点"
+                    "10": "7-9点", "20": "9-11点",
+                    "30": "11-13点", "40": "13-15点", "50": "15-17点", "60": "17-19点","70": "19-21点"
                     }.get(slot_suffix, "未知时间段")
 
                     availability_info[(slot_date, slot_time)] = available_count
@@ -375,9 +374,8 @@ if available_dates != []:
                     # **只存入当前点击的日期，不存入其他日期**
                     if slot_date == date:
                         slot_time = {
-                            "10": "9-11点", "20": "11-13点",
-                            "30": "13-15点", "40": "15-17点",
-                            "50": "17-19点", "60": "19-21点"
+                        "10": "7-9点", "20": "9-11点",
+                        "30": "11-13点", "40": "13-15点", "50": "15-17点", "60": "17-19点","70": "19-21点"
                         }.get(slot_suffix, "未知时间段")
     
                         availability_info[(slot_date, slot_time)] = available_count
