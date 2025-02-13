@@ -361,11 +361,13 @@ def parse_schedule(driver):
 
         # 尝试点击 "次へ" 按钮进入下一天
         try:
-            next_btn = driver.find_element(By.XPATH, "//img[@alt='次へ']")
+            next_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//img[@alt='次へ']"))
+            )
             next_btn.click()
             time.sleep(1)  # 等待页面加载
-        except ElementNotInteractableException:
-            logging.info("已到达最后一天，停止获取。")
+        except TimeoutException:
+            logging.info("找不到 '次へ' 按钮，可能已经到达最后一天，停止获取。")
             break
 
     return all_slots
