@@ -418,7 +418,12 @@ for slot in all_available_slots:
     # 祝休日保留所有时段
     if is_holiday:
         partial_available_slots.append(slot)
-
+        
+if partial_available_slots = []:
+    logging.warning("⚠️ 未找到空位，程序终止。")
+    driver.quit()
+    exit(0)  # 终止程序
+    
 # 打印筛选后的可预约时间
 logging.info("🎾 筛选后的部分空位信息（partial_available_slots）：")
 for slot in partial_available_slots:
