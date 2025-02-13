@@ -419,7 +419,7 @@ for slot in all_available_slots:
     if is_holiday:
         partial_available_slots.append(slot)
         
-if partial_available_slots = []:
+if partial_available_slots == []:
     logging.warning("⚠️ 未找到空位，程序终止。")
     driver.quit()
     exit(0)  # 终止程序
