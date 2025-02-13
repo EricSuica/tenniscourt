@@ -21,10 +21,6 @@ from selenium import webdriver
 import shutil
 from selenium.common.exceptions import StaleElementReferenceException
 
-
-
-
-
 # 设置日志
 logging.basicConfig(
     filename="tennis_toneri.log",  # 输出到文件
@@ -165,7 +161,48 @@ for match in pattern.finditer(html_before_click):
         available_dates.append(date_number)
     elif status == "一部空き":
         partially_available_dates.append(date_number)
+        
+# 点击“下月”按钮
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "next-month"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '下月'，进入新页面")
+    time.sleep(10)  # **短暂等待 JS 渲染**
 
+    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    # 获取 `month-head` 的文本
+    month_text = month_element.text
+
+    # 记录日志
+    logging.info(f"✅ 已出现 下月信息: {month_text}")
+
+except Exception as e:
+    logging.exception("操作失败（下月）：%s", e)
+
+# **获取下月 HTML 页面**
+html_next_month = driver.execute_script("return document.body.outerHTML;")
+
+# **正则表达式匹配 下月可预约的日期**
+pattern_next = re.compile(
+    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"',
+    re.S
+)
+# **使用正则表达式提取下月可预约的日期**
+matches = list(pattern_next.finditer(html_next_month))  # 先把匹配项存入列表
+
+if not matches:  # 如果 `matches` 为空
+    logging.info(f"⚠️ {month_text} 空位未开放查询")
+else:
+    for match in matches:
+        date_number = match.group(1)
+        status = match.group(2)
+
+        if status == "全て空き":
+            available_dates.append(date_number)
+        elif status == "一部空き":
+            partially_available_dates.append(date_number)
 
 logging.info(f"可预约的日期（完全空闲）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲）：{partially_available_dates}")
