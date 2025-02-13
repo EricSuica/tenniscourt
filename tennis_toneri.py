@@ -42,9 +42,6 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-blink-features=AutomationControlled")  
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")  
-import tempfile
-unique_user_data_dir = tempfile.mkdtemp()
-options.add_argument(f"--user-data-dir={unique_user_data_dir}")
 
 # 2️⃣ 启动 WebDriver
 service = Service(ChromeDriverManager().install())
@@ -186,6 +183,12 @@ partially_available_dates = [date for date in partially_available_dates if is_ho
 logging.info(f"可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
 
+if partial_available_slots == []:
+    logging.warning("⚠️ 未找到空位，程序终止。")
+    driver.quit()
+    exit(0)  # 终止程序
+    
+
 # **存储所有空位信息**
 availability_info = {}
 
@@ -240,8 +243,6 @@ for (date, time_slot), count in availability_info.items():
     logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
 
 driver.quit()
-shutil.rmtree(unique_user_data_dir, ignore_errors=True)  # 删除临时目录
-
 
 
 
