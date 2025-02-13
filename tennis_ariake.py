@@ -143,13 +143,60 @@ while retry_count < max_retries:
 # **获取当前 HTML 页面**
 html_before_click = driver.execute_script("return document.body.outerHTML;")
 
-# ✅ **使用正则表达式提取可预约的日期**
+# ✅ **使用正则表达式提取当月可预约的日期**
 available_dates = []
 partially_available_dates = []
 
 pattern = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
 
 for match in pattern.finditer(html_before_click):
+    date_number = match.group(1)
+    status = match.group(2)
+
+    if status == "全て空き":
+        available_dates.append(date_number)
+    elif status == "一部空き":
+        partially_available_dates.append(date_number)
+
+
+# 使用正则表达式提取月份信息
+match_current = re.search(r'<span class="month-date-middle[^"]*" id="month-head">(\d{4})年(\d{1,2})月</span>', html_before_click)
+
+if match_current:
+    year = int(match_current.group(1))  # 提取年份（2025）
+    current_month = int(match_current.group(2))  # 提取月份（2）
+    print(f"当前年份: {year}, 当前月份: {current_month}")
+else:
+    print("❌ 未能解析月份信息")
+    
+# 点击“下月”按钮
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "next-month"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '下月'，进入新页面")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    logging.info("已出现 下月信息")
+
+except Exception as e:
+    logging.exception("操作失败（下月）：%s", e)
+    
+# **获取下月 HTML 页面**
+html_next_month = driver.execute_script("return document.body.outerHTML;")
+
+# 使用正则表达式提取月份信息
+match_next = re.search(r'<span class="month-date-middle[^"]*" id="month-head">(\d{4})年(\d{1,2})月</span>', html_next_month)
+
+if match_next:
+    next_year = int(match_next.group(1))  # 提取年份（2025）
+    next_month = int(match_next.group(2))  # 提取月份（3）
+    print(f"当前年份: {next_year}, 当前月份: {next_month}")
+else:
+    print("❌ 未能解析下月信息")
+    
+# ✅ **使用正则表达式提取下月可预约的日期**
+for match in pattern.finditer(html_next_month):
     date_number = match.group(1)
     status = match.group(2)
 
