@@ -188,7 +188,9 @@ pattern_next = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectD
 for match in pattern_next.finditer(html_next_month):
     date_number = match.group(1)
     status = match.group(2)
-    logging.info(f"✅ {date_number}")
+    if date_number == []:
+        logging.info(f"⚠️{month_text}空位未开放查询")
+        break
     if status == "全て空き":
         available_dates.append(date_number)
     elif status == "一部空き":
