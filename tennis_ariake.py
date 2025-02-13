@@ -176,8 +176,8 @@ try:
     )
     image_button.click()
     logging.info("已点击按钮 '下月'，进入新页面")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
-    logging.info("已出现 下月信息")
+    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    logging.info("已出现 下月信息"，month_element )
 
 except Exception as e:
     logging.exception("操作失败（下月）：%s", e)
@@ -190,8 +190,6 @@ pattern_next = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectD
 
 # 使用正则表达式提取月份信息
 match_next = re.search(r'<span class="month-date-middle[^"]*" id="month-head">(\d{4})年(\d{1,2})月</span>', html_next_month)
-logging.info(match_next)
-
     
 # ✅ **使用正则表达式提取下月可预约的日期**
 
