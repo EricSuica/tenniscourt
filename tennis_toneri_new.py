@@ -28,7 +28,7 @@ import jpholiday
 # 配置日志和加载环境变量
 # ---------------------------
 logging.basicConfig(
-    filename="tennis_toneri.log",
+    filename="tennis_toneri_new.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -278,7 +278,7 @@ def send_email(subject, body):
 
 def process_email_notification(availability_info):
     """比较最新预约信息与上次保存的内容，如有变化则发送邮件通知，并更新文件"""
-    last_file = "last_availability_toneri.txt"
+    last_file = "last_availability_toneri_new.txt"
     if os.path.exists(last_file):
         with open(last_file, "r", encoding="utf-8") as f:
             last_availability = f.read()
