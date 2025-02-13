@@ -173,6 +173,12 @@ partially_available_dates = [date for date in partially_available_dates if is_ho
 logging.info(f"可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
 
+if partially_available_dates == []:
+    logging.warning("⚠️ 未找到空位，程序终止。")
+    driver.quit()
+    exit(0)  # 终止程序
+    
+
 # **存储所有空位信息**
 availability_info = {}
 
