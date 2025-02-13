@@ -412,7 +412,7 @@ for slot in all_available_slots:
 
 
     # 祝休日保留所有时段
-    if is_holiday:
+    if is_holiday and time_range in ["11:00-13:00", "13:00-15:00", "15:00-17:00", "17:00-19:00"]:
         partial_available_slots.append(slot)
 
 # 打印筛选后的可预约时间
