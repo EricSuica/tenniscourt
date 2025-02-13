@@ -229,6 +229,7 @@ if partially_available_dates == []:
 # **存储所有空位信息**
 availability_info = {}
 
+time.sleep(2)  # **短暂等待 JS 渲染**
 
 # 1️⃣4️⃣ **点击可预约的日期**
 for date in available_dates + partially_available_dates:
@@ -252,7 +253,8 @@ for date in available_dates + partially_available_dates:
             )
             date_element.click()
             logging.info(f"✅ 成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
-
+            time.sleep(2)  # **短暂等待 JS 渲染**
+            
             # ✅ **等待 `week-info` 确保时间段已加载**
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.ID, "week-info"))
