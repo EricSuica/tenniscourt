@@ -38,7 +38,7 @@ options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
-# 2️⃣ 访问主页并确保加载成功
+# 访问主页并确保加载成功
 url = "https://user.shinjuku-shisetsu-yoyaku.jp/regasu/reserve/gin_menu"
 while True:
     driver.get(url)
@@ -47,11 +47,24 @@ while True:
             EC.visibility_of_element_located((By.ID, "contents"))
         )
         logging.info("主页加载成功")
-        break
+
+        # 休息日检查
+        try:
+            inner_content = driver.find_element(By.ID, "inner-contents").text
+            if "本日はサービス休止日となっております" in inner_content:
+                logging.warning("⚠️ 今日是服务休止日，程序终止。")
+                driver.quit()
+                exit(0)  # 终止程序
+        except NoSuchElementException:
+            logging.info("✅ 未发现休止日提示，继续执行。")
+
+        break  # 成功加载主页且不是休止日，跳出循环
     except TimeoutException:
         logging.warning("主页加载超时，正在刷新...")
+
 time.sleep(random.uniform(1, 3))
 logging.info("搜索按钮加载成功")
+
 
 # 3️⃣ 依次点击页面中的各个按钮或链接
 
