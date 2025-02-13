@@ -147,6 +147,10 @@ while retry_count < max_retries:
 # **获取当前 HTML 页面**
 html_before_click = driver.execute_script("return document.body.outerHTML;")
 
+month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+# 获取 `month-head` 的文本
+month_text = month_element.text
+
 # ✅ **使用正则表达式提取可预约的日期**
 available_dates = []
 partially_available_dates = []
@@ -161,70 +165,11 @@ for match in pattern.finditer(html_before_click):
         available_dates.append(date_number)
     elif status == "一部空き":
         partially_available_dates.append(date_number)
-        
-# 点击“下月”按钮
-try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "next-month"))
-    )
-    image_button.click()
-    logging.info("已点击按钮 '下月'，进入新页面")
-    time.sleep(5)  # **短暂等待 JS 渲染**
-
-    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
-    # 获取 `month-head` 的文本
-    month_text = month_element.text
-
-    # 记录日志
-    logging.info(f"✅ 已出现 下月信息: {month_text}")
-
-except Exception as e:
-    logging.exception("操作失败（下月）：%s", e)
-
-# **获取下月 HTML 页面**
-html_next_month = driver.execute_script("return document.body.outerHTML;")
-
-# **正则表达式匹配 下月可预约的日期**
-pattern_next = re.compile(
-    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"',
-    re.S
-)
-# **使用正则表达式提取下月可预约的日期**
-matches = list(pattern_next.finditer(html_next_month))  # 先把匹配项存入列表
-
-if not matches:  # 如果 `matches` 为空
-    logging.info(f"⚠️ {month_text} 空位未开放查询")
-else:
-    for match in matches:
-        date_number = match.group(1)
-        status = match.group(2)
-
-        if status == "全て空き":
-            available_dates.append(date_number)
-        elif status == "一部空き":
-            partially_available_dates.append(date_number)
-
-# **返回前一个页面**
-try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "last-month"))
-    )
-    image_button.click()
-    logging.info("已点击按钮 '前月'，进入新页面")
-    time.sleep(5)  # **短暂等待 JS 渲染**
-    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
-    # 获取 `month-head` 的文本
-    month_text = month_element.text
-
-    # 记录日志
-    logging.info(f"✅ 已出现 前月信息: {month_text}")
-
-except Exception as e:
-    logging.exception("操作失败（前月）：%s", e)
 
 
-logging.info(f"可预约的日期（完全空闲）：{available_dates}")
-logging.info(f"可预约的日期（部分空闲）：{partially_available_dates}")
+
+logging.info(f"{month_text}可预约的日期（完全空闲）：{available_dates}")
+logging.info(f"{month_text}可预约的日期（部分空闲）：{partially_available_dates}")
 
 
 # 🎌 **过滤掉非休日 & 非祝日的日期**
@@ -236,11 +181,11 @@ def is_holiday_or_weekend(date_str):
 available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
 partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
 
-logging.info(f"可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
-logging.info(f"可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
+logging.info(f"{month_text}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
 
 if partially_available_dates == []:
-    logging.warning("⚠️ 未找到空位，程序终止。")
+    logging.warning(f"{month_text_current}⚠️ 未找到空位，程序终止。")
     driver.quit()
     exit(0)  # 终止程序
     
@@ -315,6 +260,139 @@ for date in available_dates + partially_available_dates:
             driver.quit()
             exit(0)  # 终止程序
             break  # 超时错误，终止当前日期的尝试
+
+
+# 点击“下月”按钮
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "next-month"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '下月'，进入新页面")
+    time.sleep(5)  # **短暂等待 JS 渲染**
+
+    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    # 获取 `month-head` 的文本
+    month_text = month_element.text
+
+    # 记录日志
+    logging.info(f"✅ 已出现 下月信息: {month_text}")
+
+except Exception as e:
+    logging.exception("操作失败（下月）：%s", e)
+
+# **获取下月 HTML 页面**
+html_next_month = driver.execute_script("return document.body.outerHTML;")
+
+# **正则表达式匹配 下月可预约的日期**
+pattern_next = re.compile(
+    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"',
+    re.S
+)
+# **使用正则表达式提取下月可预约的日期**
+matches = list(pattern_next.finditer(html_next_month))  # 先把匹配项存入列表
+
+available_dates = []
+partially_available_dates = []
+
+if not matches:  # 如果 `matches` 为空
+    logging.info(f"⚠️ {month_text} 空位未开放查询")
+else:
+    for match in matches:
+        date_number = match.group(1)
+        status = match.group(2)
+
+        if status == "全て空き":
+            available_dates.append(date_number)
+        elif status == "一部空き":
+            partially_available_dates.append(date_number)
+
+if available_dates != []:
+    logging.info(f"{month_text}可预约的日期（完全空闲）：{available_dates}")
+    logging.info(f"{month_text}可预约的日期（部分空闲）：{partially_available_dates}")
+    
+    
+    # 🎌 **过滤掉非休日 & 非祝日的日期**
+    def is_holiday_or_weekend(date_str):
+        """检查日期是否为日本的周六、周日或祝日"""
+        date_obj = datetime.strptime(date_str, "%Y%m%d")
+        return date_obj.weekday() in [5, 6] or jpholiday.is_holiday(date_obj)
+    
+    available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
+    partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
+    
+    logging.info(f"{month_text_current}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+    logging.info(f"{month_text_current}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
+    
+    
+    
+    
+    # 1️⃣4️⃣ **点击可预约的日期**
+    for date in available_dates + partially_available_dates:
+        logging.info(f"尝试点击日期：{date[:4]}年{date[4:6]}月{date[6:]}日")
+    
+        attempt = 0
+        max_attempts = 3  # 允许最多重试 3 次
+    
+        while attempt < max_attempts:
+            try:
+                attempt += 1
+                logging.info(f"🔄 尝试第 {attempt} 次点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+    
+                # 重新获取元素，确保元素有效
+                date_element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, f"month_{date}"))
+                )
+    
+                date_element = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, f"month_{date}"))
+                )
+                date_element.click()
+                logging.info(f"✅ 成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+                time.sleep(2)  # **短暂等待 JS 渲染**
+                
+                # ✅ **等待 `week-info` 确保时间段已加载**
+                WebDriverWait(driver, 30).until(
+                    EC.presence_of_element_located((By.ID, "week-info"))
+                )
+                logging.info(f"✅ {date[:4]}年{date[4:6]}月{date[6:]}日 的时间段已加载")
+    
+                # **获取最新 HTML**
+                html_after_click = driver.execute_script("return document.body.outerHTML;")
+    
+                # **先清理当前日期的旧数据，防止错误数据残留**
+                availability_info = {k: v for k, v in availability_info.items() if k[0] != date}
+    
+                # **解析新数据**
+                pattern_slots = re.compile(
+                    r'<input id="A_(\d{8})_(\d{2})" type="hidden" value="(\d+)">',
+                    re.S
+                )
+    
+                for match in pattern_slots.finditer(html_after_click):
+                    slot_date, slot_suffix, available_count = match.groups()
+    
+                    # **只存入当前点击的日期，不存入其他日期**
+                    if slot_date == date:
+                        slot_time = {
+                            "10": "9-11点", "20": "11-13点",
+                            "30": "13-15点", "40": "15-17点",
+                            "50": "17-19点", "60": "19-21点"
+                        }.get(slot_suffix, "未知时间段")
+    
+                        availability_info[(slot_date, slot_time)] = available_count
+    
+                break  # 成功后退出循环
+    
+            except StaleElementReferenceException:
+                logging.warning(f"⚠️ 目标元素失效，第 {attempt} 次重试 {date[:4]}年{date[4:6]}月{date[6:]}日...")
+                time.sleep(1)  # 短暂等待，避免频繁请求
+    
+            except TimeoutException:
+                logging.error(f"❌ 无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+                driver.quit()
+                exit(0)  # 终止程序
+                break  # 超时错误，终止当前日期的尝试
 
 
 
