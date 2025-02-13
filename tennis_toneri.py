@@ -18,8 +18,8 @@ time.sleep(random.uniform(1, 30))  # 等待随机秒数
 
 
 from selenium import webdriver
-import tempfile
 import shutil
+from selenium.common.exceptions import StaleElementReferenceException
 
 
 
@@ -198,8 +198,12 @@ for date in available_dates + partially_available_dates:
 
     try:
         date_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, f"month_{date}"))
+        )  # 确保元素存在
+
+        date_element = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, f"month_{date}"))
-        )
+        )  # 再次确保可点击
         date_element.click()
         logging.info(f"成功点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
 
@@ -236,7 +240,8 @@ for date in available_dates + partially_available_dates:
 
     except TimeoutException:
         logging.error(f"无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
-
+    except StaleElementReferenceException:
+        logging.warning("⚠️ 目标元素失效，正在重新获取...")
 # **最终汇总**
 logging.info("所有可预约时间段:")
 for (date, time_slot), count in availability_info.items():
