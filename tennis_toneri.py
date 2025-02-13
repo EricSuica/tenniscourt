@@ -321,8 +321,8 @@ if available_dates != []:
     available_dates = [date for date in available_dates if is_holiday_or_weekend(date)]
     partially_available_dates = [date for date in partially_available_dates if is_holiday_or_weekend(date)]
     
-    logging.info(f"{month_text_current}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
-    logging.info(f"{month_text_current}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
+    logging.info(f"{month_text}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
+    logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
     
     
     
