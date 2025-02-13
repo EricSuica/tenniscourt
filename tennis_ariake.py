@@ -179,7 +179,6 @@ except Exception as e:
     
 # **获取下月 HTML 页面**
 html_next_month = driver.execute_script("return document.body.outerHTML;")
-logging.info(html_next_month)
 # **获取下月 空位信息**
 pattern_next = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
 
