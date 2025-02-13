@@ -293,6 +293,8 @@ for date in available_dates + partially_available_dates:
 
         except TimeoutException:
             logging.error(f"❌ 无法点击 {date[:4]}年{date[4:6]}月{date[6:]}日")
+            driver.quit()
+            exit(0)  # 终止程序
             break  # 超时错误，终止当前日期的尝试
 
 
