@@ -177,24 +177,29 @@ try:
 except Exception as e:
     logging.exception("操作失败（下月）：%s", e)
     
+
 # **获取下月 HTML 页面**
 html_next_month = driver.execute_script("return document.body.outerHTML;")
 
-# **获取下月 空位信息**
-pattern_next = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
-    
-# ✅ **使用正则表达式提取下月可预约的日期**
+# **正则表达式匹配 下月可预约的日期**
+pattern_next = re.compile(
+    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"',
+    re.S
+)
+# **使用正则表达式提取下月可预约的日期**
+matches = list(pattern_next.finditer(html_next_month))  # 先把匹配项存入列表
 
-for match in pattern_next.finditer(html_next_month):
-    date_number = match.group(1)
-    status = match.group(2)
-    if date_number == []:
-        logging.info(f"⚠️{month_text}空位未开放查询")
-        break
-    if status == "全て空き":
-        available_dates.append(date_number)
-    elif status == "一部空き":
-        partially_available_dates.append(date_number)
+if not matches:  # 如果 `matches` 为空
+    logging.info(f"⚠️ {month_text} 空位未开放查询")
+else:
+    for match in matches:
+        date_number = match.group(1)
+        status = match.group(2)
+
+        if status == "全て空き":
+            available_dates.append(date_number)
+        elif status == "一部空き":
+            partially_available_dates.append(date_number)
 
 
 logging.info(f"可预约的日期（完全空闲）：{available_dates}")
