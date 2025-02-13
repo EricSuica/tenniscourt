@@ -200,7 +200,24 @@ else:
             available_dates.append(date_number)
         elif status == "一部空き":
             partially_available_dates.append(date_number)
+            
+# **返回前一个页面**
+try:
+    image_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "last-month"))
+    )
+    image_button.click()
+    logging.info("已点击按钮 '前月'，进入新页面")
+    time.sleep(5)  # **短暂等待 JS 渲染**
+    month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
+    # 获取 `month-head` 的文本
+    month_text = month_element.text
 
+    # 记录日志
+    logging.info(f"✅ 已出现 前月信息: {month_text}")
+
+except Exception as e:
+    logging.exception("操作失败（前月）：%s", e)
 
 logging.info(f"可预约的日期（完全空闲）：{available_dates}")
 logging.info(f"可预约的日期（部分空闲）：{partially_available_dates}")
