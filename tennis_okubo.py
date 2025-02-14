@@ -393,10 +393,12 @@ if available_dates != []:
 
 # 点击“前月”按钮
 try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "last-month"))
+    last_month_button = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "last-month"))
     )
-    image_button.click()
+
+    # 使用 JavaScript 直接点击按钮
+    driver.execute_script("arguments[0].click();", last_month_button)
     logging.info("已点击按钮 '前月'，进入新页面")
     time.sleep(3)  # **短暂等待 JS 渲染**
 
