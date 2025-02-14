@@ -129,10 +129,8 @@ month_text = month_element.text
 available_dates = []
 partially_available_dates = []
 
-pattern = re.compile(
-    r'<td id="month_(\d+)"[^>]*?>.*?<img[^>]*?class="calendar-status"[^>]*?alt="(全て空き|一部空き)"',
-    re.S
-)
+pattern = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
+
 for match in pattern.finditer(html_current):
     date_number = match.group(1)
     status = match.group(2)
@@ -262,10 +260,8 @@ except Exception as e:
 html_next_month = driver.execute_script("return document.body.outerHTML;")
 
 # **正则表达式匹配 下月可预约的日期**
-pattern = re.compile(
-    r'<td id="month_(\d+)"[^>]*?>.*?<img[^>]*?class="calendar-status"[^>]*?alt="(全て空き|一部空き)"',
-    re.S
-)
+pattern = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"', re.S)
+
 # **使用正则表达式提取下月可预约的日期**
 matches = list(pattern.finditer(html_next_month))  # 先把匹配项存入列表
 
