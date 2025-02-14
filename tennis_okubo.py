@@ -682,7 +682,7 @@ if available_dates != []:
 # **最终汇总**
 logging.info("所有可预约时间段:")
 for (date, time_slot), count in availability_info.items():
-    logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
+    logging.info(f"{date} | {time_slot}")
 
 driver.quit()
 
