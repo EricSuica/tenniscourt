@@ -186,10 +186,6 @@ logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日�
 
 """
 
-if partially_available_dates == []:
-    logging.warning(f"{month_text}⚠️ 未找到空位，程序终止。")
-    driver.quit()
-    exit(0)  # 终止程序
     
 
 
@@ -477,10 +473,6 @@ logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日�
 
 """
 
-if partially_available_dates == []:
-    logging.warning(f"{month_text}⚠️ 未找到空位，程序终止。")
-    driver.quit()
-    exit(0)  # 终止程序
     
 
 
