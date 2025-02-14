@@ -249,7 +249,7 @@ html_next_month = driver.execute_script("return document.body.outerHTML;")
 pattern = re.compile(r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き|予約あり)"', re.S)
 
 # **使用正则表达式提取下月可预约的日期**
-matches = list(pattern_next.finditer(html_next_month))  # 先把匹配项存入列表
+matches = list(pattern.finditer(html_next_month))  # 先把匹配项存入列表
 available_dates = []
 partially_available_dates = []
 
