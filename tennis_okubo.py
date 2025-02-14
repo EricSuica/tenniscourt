@@ -394,7 +394,7 @@ try:
         EC.element_to_be_clickable((By.ID, "last-month"))
     )
     image_button.click()
-    logging.info("已点击按钮 '下月'，进入新页面")
+    logging.info("已点击按钮 '前月'，进入新页面")
     time.sleep(3)  # **短暂等待 JS 渲染**
 
     month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
@@ -547,12 +547,14 @@ for date in available_dates + partially_available_dates:
 
 # 点击“下月”按钮
 try:
-    image_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "next-month"))
+    next_month_button = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "next-month"))
     )
-    image_button.click()
+
+    # 使用 JavaScript 直接点击按钮
+    driver.execute_script("arguments[0].click();", next_month_button)
     logging.info("已点击按钮 '下月'，进入新页面")
-    time.sleep(5)  # **短暂等待 JS 渲染**
+    time.sleep(3)  # **短暂等待 JS 渲染**
 
     month_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "month-head")))
     # 获取 `month-head` 的文本
