@@ -85,7 +85,7 @@ try:
     select.select_by_visible_text("大久保スポーツプラザ（庭球場）")
 
     logging.info("已选择 '大久保スポーツプラザ（庭球場）'")
-    
+    time.sleep(2)  # **短暂等待 JS 渲染**
     # 等待页面更新
     WebDriverWait(driver, 10).until(
         EC.text_to_be_present_in_element(
@@ -95,7 +95,7 @@ try:
     )
 except Exception as e:
     logging.exception("操作失败（选择 '大久保スポーツプラザ（庭球場）'):%s", e)
-
+time.sleep(2)  # **短暂等待 JS 渲染**
 
 # 点击“搜索“按钮
 try:
@@ -107,7 +107,8 @@ try:
     logging.info("已点击按钮 '搜索',并进入新页面，并成功获取周空位信息")
 except Exception as e:
     logging.exception("操作失败(搜索):%s", e)
-
+    
+time.sleep(2)  # **短暂等待 JS 渲染**
 # 点击“月表示“按钮
 try:
     # 等待并点击 "月表示" 按钮
