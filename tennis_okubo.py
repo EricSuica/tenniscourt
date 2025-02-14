@@ -123,7 +123,7 @@ except Exception as e:
 
 
 # “已选择 '庭球場 １面' (value=10250080)”
-
+time.sleep(2)  # **短暂等待 JS 渲染**
 try:
     # 等待 select 元素加载
     select_element = WebDriverWait(driver, 10).until(
