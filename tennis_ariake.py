@@ -290,7 +290,7 @@ for date in available_dates + partially_available_dates:
 # **最终汇总**
 logging.info("所有可预约时间段:")
 for (date, time_slot), count in availability_info.items():
-    logging.info(f"{date} | {time_slot} | 可预约：{count} 人")
+    logging.info(f"{date} | {time_slot}")
 
 driver.quit()
 
@@ -360,7 +360,7 @@ weekday_japanese = ["月", "火", "水", "木", "金", "土", "日"]
 
 # 📝 **当前预约信息（排序后，带星期）**
 current_availability = "\n".join([
-    f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot} | 可预约：{count} 人"
+    f"{date[:4]}-{date[4:6]}-{date[6:]} ({weekday_japanese[datetime.strptime(date, '%Y%m%d').weekday()]}) | {time_slot}"
     for (date, time_slot), count in sorted_availability
 ])
 
