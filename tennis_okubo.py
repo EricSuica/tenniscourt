@@ -287,6 +287,8 @@ try:
 
 except Exception as e:
     logging.exception("操作失败（下月）：%s", e)
+    driver.quit()
+    exit(0)  # 终止程序
 
 # **获取下月 HTML 页面**
 html_next_month = driver.execute_script("return document.body.outerHTML;")
