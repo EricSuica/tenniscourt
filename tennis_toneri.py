@@ -15,7 +15,8 @@ import jpholiday
 from datetime import datetime
 load_dotenv("/root/tenniscourt/config.env", override=True)
 time.sleep(random.uniform(1, 30))  # 等待随机秒数
-
+# **存储所有空位信息**
+availability_info = {}
 
 from selenium import webdriver
 import shutil
@@ -184,14 +185,8 @@ partially_available_dates = [date for date in partially_available_dates if is_ho
 logging.info(f"{month_text}可预约的日期（完全空闲，仅休日&祝日）：{available_dates}")
 logging.info(f"{month_text}可预约的日期（部分空闲，仅休日&祝日）：{partially_available_dates}")
 
-if partially_available_dates == []:
-    logging.warning(f"{month_text}⚠️ 未找到空位，程序终止。")
-    driver.quit()
-    exit(0)  # 终止程序
     
 
-# **存储所有空位信息**
-availability_info = {}
 
 
 # 1️⃣4️⃣ **点击可预约的日期**
