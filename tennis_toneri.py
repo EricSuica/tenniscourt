@@ -286,7 +286,7 @@ html_next_month = driver.execute_script("return document.body.outerHTML;")
 
 # **正则表达式匹配 下月可预约的日期**
 pattern_next = re.compile(
-    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き)"',
+    r'<td id="month_(\d+)"[^>]*onclick="javascript:selectDay\(\d+\);".*?<img[^>]*?alt="(全て空き|一部空き|予約あり)"',
     re.S
 )
 # **使用正则表达式提取下月可预约的日期**
