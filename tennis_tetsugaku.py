@@ -390,7 +390,7 @@ while True:  # 循环直到无法翻页
     try:
         next_button = driver.find_element("xpath", "//img[@alt='次へ']")
         next_button.click()
-        time.sleep(1)  # 等待页面加载
+        time.sleep(3)  # 等待页面加载
     except ElementNotInteractableException:
         logging.info("已到达最后一天，停止获取。")
         break
@@ -419,10 +419,6 @@ for slot in all_available_slots:
     if is_holiday:
         partial_available_slots.append(slot)
         
-if partial_available_slots == []:
-    logging.warning("⚠️ 未找到空位，程序终止。")
-    driver.quit()
-    exit(0)  # 终止程序
     
 # 打印筛选后的可预约时间
 logging.info("🎾 筛选后的部分空位信息（partial_available_slots）：")
