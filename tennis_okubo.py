@@ -70,6 +70,8 @@ try:
     logging.info("已点击按钮 '1か月'")
 except Exception as e:
     logging.exception("操作失败(1か月按钮):%s", e)
+    driver.quit()
+    exit(0)  # 终止程序
 
 # “选择大久保スポーツプラザ（庭球場）”
 try:
@@ -95,6 +97,9 @@ try:
     )
 except Exception as e:
     logging.exception("操作失败（选择 '大久保スポーツプラザ（庭球場）'):%s", e)
+    driver.quit()
+    exit(0)  # 终止程序
+
 time.sleep(2)  # **短暂等待 JS 渲染**
 
 # 点击“搜索“按钮
@@ -107,6 +112,8 @@ try:
     logging.info("已点击按钮 '搜索',并进入新页面，并成功获取周空位信息")
 except Exception as e:
     logging.exception("操作失败(搜索):%s", e)
+    driver.quit()
+    exit(0)  # 终止程序
     
 time.sleep(2)  # **短暂等待 JS 渲染**
 # 点击“月表示“按钮
@@ -121,7 +128,8 @@ try:
 
 except Exception as e:
     logging.exception("点击 '月表示' 按钮失败：%s", e)
-
+    driver.quit()
+    exit(0)  # 终止程序
 
 # “已选择 '庭球場 １面' (value=10250080)”
 time.sleep(2)  # **短暂等待 JS 渲染**
@@ -570,6 +578,8 @@ try:
 
 except Exception as e:
     logging.exception("操作失败（下月）：%s", e)
+    driver.quit()
+    exit(0)  # 终止程序
 
 # **获取下月 HTML 页面**
 html_next_month = driver.execute_script("return document.body.outerHTML;")
